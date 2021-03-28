@@ -4,7 +4,10 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.hardware.usb.UsbManager
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import com.github.bhlangonijr.chesslib.Board
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
@@ -12,14 +15,58 @@ import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.io.Closeable
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.collections.HashSet
 
 @ExperimentalUnsignedTypes
-internal class LiBoard(activity: Activity, gameEventHandler: GameEventHandler) : NewPositionHandler {
+internal class LiBoard(activity: Activity, var gameEventHandler: GameEventHandler) : NewPositionHandler, Closeable {
     private val connection = Connection(activity, this)
+    val handler = Handler(Looper.getMainLooper())
+    val runnable = Runnable {
+        this.generateMove()
+    }
+    lateinit var knownPosition: Position
+    lateinit var physicalPosition: Position
+    val liftedPieces = HashSet<UByte>()
 
-    override fun onNewPosition(position: LiBoardPosition) {
-        TODO("Not yet implemented")
+
+    private fun generateMove() {
+        val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
+        val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
+        val temporarilyLiftedPieces = liftedPieces.minus(physicalPosition.occupiedSquares)
+
+        if (disappearances.size == 1 && appearances.size == 1) {
+            // normal move
+        } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
+            // capture
+        } else if (disappearances.size == 2 && appearances.size == 1) {
+            // en passant
+        } else if (disappearances.size == 2 && appearances.size == 2) {
+            // castling
+        }
+    }
+
+    override fun onNewPosition(position: Position) {
+        handler.removeCallbacks(runnable)
+        physicalPosition = position
+        if (position == Position.STARTING_POSITION) {
+            knownPosition = position
+            // reset chessboard
+            gameEventHandler.onGameStart()
+            liftedPieces.clear()
+        } else {
+            liftedPieces.addAll(knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares))
+            if (MOVE_DELAY > 0) handler.postDelayed(runnable, MOVE_DELAY)
+            else runnable.run()
+        }
+    }
+
+    override fun close() {
+        connection.close()
+    }
+
+    companion object {
+        val MOVE_DELAY = 25L // in ms
     }
 }
 
@@ -33,7 +80,7 @@ private class Connection(activity: Activity, var newPositionHandler: NewPosition
     init {
         val availableDrivers = prober.findAllDrivers(usbManager)
         Log.d("serialConnect", "Drivers: $availableDrivers")
-        if (availableDrivers.isEmpty()) throw LiBoardMissingDriverException("No drivers available")
+        if (availableDrivers.isEmpty()) throw MissingDriverException("No drivers available")
 
         // Open a connection to the first available driver.
         val driver = availableDrivers.first()
@@ -45,13 +92,15 @@ private class Connection(activity: Activity, var newPositionHandler: NewPosition
                     activity.intent, 0
                 )
             )
-            throw LiBoardUsbPermissionException("No Usb permission")
+            throw UsbPermissionException("No Usb permission")
         }
 
         port = driver.ports.first()
         port.open(connection)
         port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
         port.dtr = true
+
+        Executors.newSingleThreadExecutor().submit(SerialInputOutputManager(port, this))
     }
 
     override fun close() {
@@ -65,7 +114,7 @@ private class Connection(activity: Activity, var newPositionHandler: NewPosition
             val positionBytes = LinkedList<UByte>()
             for (i in 0..8)
                 positionBytes.add(data.poll()!!)
-            newPositionHandler?.onNewPosition(LiBoardPosition(positionBytes))
+            newPositionHandler?.onNewPosition(Position(positionBytes))
         }
     }
 
@@ -82,7 +131,7 @@ private class Connection(activity: Activity, var newPositionHandler: NewPosition
 }
 
 @ExperimentalUnsignedTypes
-internal class LiBoardPosition(_bytes: Collection<UByte>) {
+internal class Position(_bytes: Collection<UByte>) {
     val occupiedSquares: Set<UByte>
     val bytes: List<UByte>
 
@@ -103,13 +152,26 @@ internal class LiBoardPosition(_bytes: Collection<UByte>) {
         occupiedSquares = s.toSet()
     }
 
+    override fun equals(other: Any?): Boolean {
+        return if (other is Position) {
+            bytes == other.bytes
+        } else super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        return bytes.hashCode()
+    }
+
+    companion object {
+        val STARTING_POSITION = Position(ubyteArrayOf(0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U))
+    }
 
     internal class LiBoardInvalidPositionError(str: String) : Exception(str)
 }
 
 @ExperimentalUnsignedTypes
 private interface NewPositionHandler {
-    fun onNewPosition(position: LiBoardPosition)
+    fun onNewPosition(position: Position)
 }
 
 internal interface GameEventHandler {
@@ -117,6 +179,6 @@ internal interface GameEventHandler {
     fun onMove()
 }
 
-internal open class LiBoardConnectionException(str: String) : Exception(str)
-internal class LiBoardMissingDriverException(str: String) : LiBoardConnectionException(str)
-internal class LiBoardUsbPermissionException(str: String) : LiBoardConnectionException(str)
+internal open class ConnectionException(str: String) : Exception(str)
+internal class MissingDriverException(str: String) : ConnectionException(str)
+internal class UsbPermissionException(str: String) : ConnectionException(str)
