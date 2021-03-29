@@ -4,10 +4,9 @@ import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.hardware.usb.UsbManager
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
@@ -20,20 +19,18 @@ import java.util.concurrent.Executors
 import kotlin.collections.HashSet
 
 @ExperimentalUnsignedTypes
-internal class LiBoard(activity: Activity, var gameEventHandler: GameEventHandler) : Closeable {
+internal class LiBoard(activity: Activity, var eventHandler: EventHandler) : Closeable {
     private val connection = Connection(activity, this)
     var board = Board()
-    private val handler = Handler(Looper.getMainLooper())
-    private val runnable = Runnable { this.generateMove() }
-    private lateinit var knownPosition: Position
-    private lateinit var physicalPosition: Position
+    private var knownPosition = Position.STARTING_POSITION
+    private var physicalPosition = Position.STARTING_POSITION
     private val liftedPieces = HashSet<Int>()
 
     private fun makeMove(move: Move): Boolean {
         if (board.doMove(move, true)) {
             knownPosition = physicalPosition
             liftedPieces.clear()
-            gameEventHandler.onMove()
+            eventHandler.onMove()
             return true
         }
         return false
@@ -46,57 +43,62 @@ internal class LiBoard(activity: Activity, var gameEventHandler: GameEventHandle
 
         if (disappearances.size == 1 && appearances.size == 1) {
             // normal move
-            // TODO check for castling or captures
-            for (move in board.legalMoves())
-                if (disappearances.contains(move.from.ordinal) && appearances.contains(move.to.ordinal))
-                    return makeMove(move)
+            // TODO check for castling or captures, add promotions
+            return makeMove(Move(disappearances.first(), appearances.first()))
         } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
             // capture
-            // TODO ensure capture
-            for (move in board.legalMoves())
-                if (disappearances.contains(move.from.ordinal) && temporarilyLiftedPieces.contains(move.to.ordinal))
-                    return makeMove(move)
+            // TODO ensure capture, add promotions
+            for (to in temporarilyLiftedPieces) {
+                if (makeMove(Move(disappearances.first(), to)))
+                    return true
+            }
+            return false
         } else if (disappearances.size == 2 && appearances.size == 1) {
             // en passant
             // TODO ensure en passant
-            for (move in board.legalMoves())
-                if (disappearances.contains(move.from.ordinal) && appearances.contains(move.to.ordinal))
-                    makeMove(move)
-
+            for (from in disappearances) {
+                for (to in appearances) {
+                    if (makeMove(Move(from, to)))
+                        return true
+                }
+            }
+            return false
         } else if (disappearances.size == 2 && appearances.size == 2) {
             // castling
             // TODO ensure castling
-            for (move in board.legalMoves())
-                if (disappearances.contains(move.from.ordinal) && appearances.contains(move.to.ordinal))
-                    makeMove(move)
+            for (from in disappearances) {
+                for (to in appearances) {
+                    if (makeMove(Move(from, to)))
+                        return true
+                }
+            }
+            return false
         }
         return false
     }
 
     private fun onNewPosition(position: Position) {
-        handler.removeCallbacks(runnable)
         physicalPosition = position
         if (position == Position.STARTING_POSITION) {
             knownPosition = position
             board = Board()
-            gameEventHandler.onGameStart()
+            eventHandler.onGameStart()
             liftedPieces.clear()
         } else {
             liftedPieces.addAll(knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares))
-            if (MOVE_DELAY > 0) handler.postDelayed(runnable, MOVE_DELAY)
-            else runnable.run()
+            generateMove()
         }
+    }
+
+    private fun onDisconnect() {
+        eventHandler.onDisconnect()
     }
 
     override fun close() {
         connection.close()
     }
 
-    companion object {
-        val MOVE_DELAY = 25L // in ms
-    }
-
-    private class Connection(activity: Activity, var liboard: LiBoard?) :
+    private class Connection(val activity: Activity, val liboard: LiBoard) :
         Closeable, SerialInputOutputManager.Listener {
         private val usbManager = activity.getSystemService(Context.USB_SERVICE) as UsbManager
         private val port: UsbSerialPort
@@ -137,15 +139,19 @@ internal class LiBoard(activity: Activity, var gameEventHandler: GameEventHandle
             data.addAll(_data.toUByteArray())
             if (data.size >= 8) {
                 val positionBytes = LinkedList<UByte>()
-                for (i in 0..8)
-                    positionBytes.add(data.poll()!!)
-                liboard?.onNewPosition(Position(positionBytes))
+                for (i in 0 until 8) {
+                    val b = data.poll()
+                    if (b != null)
+                        positionBytes.add(b)
+                }
+                liboard.onNewPosition(Position(positionBytes))
             }
         }
 
         override fun onRunError(e: java.lang.Exception) {
             Log.e(LOG_TAG, "onRunError")
-            throw e
+            close()
+            liboard.onDisconnect()
         }
 
         companion object {
@@ -191,13 +197,16 @@ internal class LiBoard(activity: Activity, var gameEventHandler: GameEventHandle
         }
     }
 
-    internal interface GameEventHandler {
+    internal interface EventHandler {
         fun onGameStart()
         fun onMove()
+        fun onDisconnect()
     }
 
     internal open class ConnectionException(str: String) : Exception(str)
     internal class MissingDriverException(str: String) : ConnectionException(str)
     internal class UsbPermissionException(str: String) : ConnectionException(str)
     internal class LiBoardInvalidPositionError(str: String) : Exception(str)
+
+    private fun Move(from: Int, to: Int) = Move(Square.squareAt(from), Square.squareAt(to))
 }
