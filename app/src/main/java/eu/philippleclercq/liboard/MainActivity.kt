@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         } catch (e: LiBoard.UsbPermissionException) {
             Toast.makeText(this, "No USB Permission", Toast.LENGTH_SHORT).show()
         }
+        button.text = if (liBoard.isConnected) "Disconnect" else "Connect"
     }
 
     override fun onDestroy() {
