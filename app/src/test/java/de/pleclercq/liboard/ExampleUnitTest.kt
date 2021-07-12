@@ -1,4 +1,4 @@
-package eu.philippleclercq.liboard
+package de.pleclercq.liboard
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package eu.philippleclercq.liboard
+package de.pleclercq.liboard
 
 import android.os.Bundle
 import android.view.View

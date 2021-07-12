@@ -1,4 +1,4 @@
-package eu.philippleclercq.liboard
+package de.pleclercq.liboard
 
 import android.app.Activity
 import android.app.PendingIntent
