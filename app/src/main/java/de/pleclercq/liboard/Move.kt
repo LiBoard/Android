@@ -8,7 +8,7 @@ import kotlin.math.abs
 
 fun Board.isCapture(move: Move) = isNormalCapture(move) || isEnPassant(move)
 
-fun Board.isNormalCapture(move: Move) = getPiece(move.from) != null
+fun Board.isNormalCapture(move: Move) = getPiece(move.to).pieceType == PieceType.NONE
 
 fun Board.isCastling(move: Move) =
     getPiece(move.from).pieceType == PieceType.KING && abs(move.from.ordinal - move.to.ordinal) == 2
