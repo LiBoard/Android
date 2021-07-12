@@ -65,7 +65,7 @@ internal class LiBoard(private val activity: Activity, var eventHandler: EventHa
     }
 
     private fun makeMove(move: Move): Boolean {
-        if (board.doMove(move, true)) {
+        if (board.doMove(move)) {
             knownPosition = physicalPosition
             liftedPieces.clear()
             eventHandler.onMove()
@@ -81,32 +81,32 @@ internal class LiBoard(private val activity: Activity, var eventHandler: EventHa
 
         if (disappearances.size == 1 && appearances.size == 1) {
             // normal move
-            // TODO check for castling or captures, add promotions
-            return makeMove(Move(disappearances.first(), appearances.first()))
+            val m = board.findMove(disappearances.first(), appearances.first())
+            return m != null && !board.isCastling(m) && !board.isCapture(m) && makeMove(m)
         } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
-            // capture
-            // TODO ensure capture, add promotions
+            // "normal" capture (not e.p.)
             for (to in temporarilyLiftedPieces) {
-                if (makeMove(Move(disappearances.first(), to)))
+                val m = board.findMove(disappearances.first(), to)
+                if (m != null && board.isNormalCapture(m) && makeMove(m))
                     return true
             }
             return false
         } else if (disappearances.size == 2 && appearances.size == 1) {
             // en passant
-            // TODO ensure en passant
             for (from in disappearances) {
                 for (to in appearances) {
-                    if (makeMove(Move(from, to)))
+                    val m = board.findMove(from, to)
+                    if (m != null && board.isEnPassant(m) && makeMove(m))
                         return true
                 }
             }
             return false
         } else if (disappearances.size == 2 && appearances.size == 2) {
             // castling
-            // TODO ensure castling
             for (from in disappearances) {
                 for (to in appearances) {
-                    if (makeMove(Move(from, to)))
+                    val m = board.findMove(from, to)
+                    if (m != null && board.isCastling(m) && makeMove(m))
                         return true
                 }
             }
@@ -119,14 +119,16 @@ internal class LiBoard(private val activity: Activity, var eventHandler: EventHa
         physicalPosition = position
         if (position == Position.STARTING_POSITION) {
             knownPosition = position
+            liftedPieces.clear()
             board = Board()
             eventHandler.onGameStart()
-            liftedPieces.clear()
         } else {
             liftedPieces.addAll(knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares))
             generateMove()
         }
     }
+
+    private fun Move(from: Int, to: Int) = Move(Square.squareAt(from), Square.squareAt(to))
     //endregion
 
     //region Connection
@@ -218,6 +220,4 @@ internal class LiBoard(private val activity: Activity, var eventHandler: EventHa
     internal class UsbPermissionException(str: String) : ConnectionException(str)
     internal class LiBoardInvalidPositionError(str: String) : Exception(str)
     //endregion
-
-    private fun Move(from: Int, to: Int) = Move(Square.squareAt(from), Square.squareAt(to))
 }
