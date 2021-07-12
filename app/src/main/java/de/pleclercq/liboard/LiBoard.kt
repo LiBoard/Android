@@ -6,7 +6,6 @@ import android.content.Context
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
@@ -16,10 +15,9 @@ import com.hoho.android.usbserial.util.SerialInputOutputManager
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.Executors
-import kotlin.collections.HashSet
 
 @ExperimentalUnsignedTypes
-internal class LiBoard(private val activity: Activity, var eventHandler: EventHandler) {
+internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) {
     var board = Board()
     private var knownPosition = Position.STARTING_POSITION
     private var physicalPosition = Position.STARTING_POSITION
@@ -127,8 +125,6 @@ internal class LiBoard(private val activity: Activity, var eventHandler: EventHa
             generateMove()
         }
     }
-
-    private fun Move(from: Int, to: Int) = Move(Square.squareAt(from), Square.squareAt(to))
     //endregion
 
     //region Connection
