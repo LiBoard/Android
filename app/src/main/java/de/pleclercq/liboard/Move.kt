@@ -15,5 +15,5 @@ fun Board.isCastling(move: Move) =
 
 fun Board.isEnPassant(move: Move) = getPiece(move.from).pieceType == PieceType.PAWN && enPassantTarget == move.to
 
-fun Board.findMove(from: Square, to: Square): Move? = legalMoves().first { m -> m.from == from && m.to == to }
+fun Board.findMove(from: Square, to: Square) = legalMoves().firstOrNull { m -> m.from == from && m.to == to }
 fun Board.findMove(from: Int, to: Int) = findMove(Square.squareAt(from), Square.squareAt(to))
