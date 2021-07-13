@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     //region UI events
     @Suppress("UNUSED_PARAMETER")
-    fun onButtonPress(view: View) = if (liBoard.isConnected) liBoard.disconnect() else attemptConnect()
+    fun onConnectButtonPressed(view: View) = if (liBoard.isConnected) liBoard.disconnect() else attemptConnect()
     //endregion
 
     private fun attemptConnect() {

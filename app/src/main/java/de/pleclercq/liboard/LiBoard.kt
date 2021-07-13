@@ -13,7 +13,9 @@ import android.content.Context
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.move.Move
+import com.github.bhlangonijr.chesslib.BoardEvent
+import com.github.bhlangonijr.chesslib.BoardEventListener
+import com.github.bhlangonijr.chesslib.BoardEventType
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
@@ -23,16 +25,30 @@ import java.io.Closeable
 import java.util.*
 import java.util.concurrent.Executors
 
+/**
+ * A class handling everything related to the board.
+ * Handles the serial connection, incoming data and move validation.
+ *
+ * @param activity The [Activity] this object belongs to. Required for access to system services, permissions etc.
+ * @param eventHandler A [EventHandler] that is used to react to game starts, moves and connection related events.
+ */
 @ExperimentalUnsignedTypes
-internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) {
-    var board = Board()
+internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) : BoardEventListener {
+    lateinit var board: Board
     private var knownPosition = Position.STARTING_POSITION
     private var physicalPosition = Position.STARTING_POSITION
     private val liftedPieces = HashSet<Int>()
     private var connection: Connection? = null
     val isConnected get() = connection != null
 
+    init {
+        newBoard()
+    }
+
     //region Position
+    /**
+     * Represents a physical board position.
+     */
     private class Position(_bytes: Collection<UByte>) {
         val occupiedSquares: Set<Int>
         val bytes: List<UByte>
@@ -69,16 +85,12 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         }
     }
 
-    private fun makeMove(move: Move): Boolean {
-        if (board.doMove(move)) {
-            knownPosition = physicalPosition
-            liftedPieces.clear()
-            eventHandler.onMove()
-            return true
-        }
-        return false
-    }
-
+    /**
+     * Tries to find a move that matches the difference between [knownPosition] and [physicalPosition].
+     * Makes the move if one was found.
+     *
+     * @return whether a move was found
+     */
     private fun generateMove(): Boolean {
         val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
         val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
@@ -87,12 +99,12 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         if (disappearances.size == 1 && appearances.size == 1) {
             // normal move
             val m = board.findMove(disappearances.first(), appearances.first())
-            return m != null && !board.isCastling(m) && !board.isCapture(m) && makeMove(m)
+            return m != null && !board.isCastling(m) && !board.isCapture(m) && board.doMove(m)
         } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
             // "normal" capture (not e.p.)
             for (to in temporarilyLiftedPieces) {
                 val m = board.findMove(disappearances.first(), to)
-                if (m != null && board.isNormalCapture(m) && makeMove(m))
+                if (m != null && board.isNormalCapture(m) && board.doMove(m))
                     return true
             }
             return false
@@ -101,7 +113,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             for (from in disappearances) {
                 for (to in appearances) {
                     val m = board.findMove(from, to)
-                    if (m != null && board.isEnPassant(m) && makeMove(m))
+                    if (m != null && board.isEnPassant(m) && board.doMove(m))
                         return true
                 }
             }
@@ -111,7 +123,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             for (from in disappearances) {
                 for (to in appearances) {
                     val m = board.findMove(from, to)
-                    if (m != null && board.isCastling(m) && makeMove(m))
+                    if (m != null && board.isCastling(m) && board.doMove(m))
                         return true
                 }
             }
@@ -120,21 +132,56 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         return false
     }
 
+    /**
+     * Gets called when a new physical board position comes in.
+     * Resets the board to the starting position if necessary
+     * or tries to find a legal move matching the position otherwise.
+     */
     private fun onNewPosition(position: Position) {
         physicalPosition = position
         if (position == Position.STARTING_POSITION) {
-            knownPosition = position
-            liftedPieces.clear()
-            board = Board()
+            newBoard()
+            updateKnownPosition()
             eventHandler.onGameStart()
         } else {
             liftedPieces.addAll(knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares))
             generateMove()
         }
     }
+
+    /**
+     * Gets called when a move happens.
+     *  Calls [updateKnownPosition] and the [eventHandler]'s [EventHandler.onMove] function.
+     */
+    override fun onEvent(event: BoardEvent) {
+        updateKnownPosition()
+        eventHandler.onMove()
+    }
+
+    /**
+     * Creates a new [Board] and registers the [BoardEventListener].
+     */
+    private fun newBoard() {
+        board = Board()
+        board.addEventListener(BoardEventType.ON_MOVE, this)
+    }
+
+    /**
+     * Sets [knownPosition] tp [physicalPosition] and clears [liftedPieces].
+     */
+    private fun updateKnownPosition() {
+        knownPosition = physicalPosition
+        liftedPieces.clear()
+    }
     //endregion
 
     //region Connection
+    /**
+     * Manages the Serial connection to the board.
+     * Connects to the board when created.
+     * Handles errors and incoming data.
+     * Closes the serial port when it's closed.
+     */
     private class Connection(activity: Activity, val liboard: LiBoard) :
         Closeable, SerialInputOutputManager.Listener {
         private val usbManager = activity.getSystemService(Context.USB_SERVICE) as UsbManager
@@ -167,10 +214,17 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             Executors.newSingleThreadExecutor().submit(SerialInputOutputManager(port, this))
         }
 
+        /**
+         * Close the connection
+         */
         override fun close() {
             port.close()
         }
 
+        /**
+         * Handles incoming data.
+         * calls [onNewPosition] when enough data (8 bytes) came in.
+         */
         override fun onNewData(_data: ByteArray) {
             Log.v(LOG_TAG, "New data: $_data")
             data.addAll(_data.toUByteArray())
@@ -185,6 +239,10 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             }
         }
 
+        /**
+         * Gets called when an error regarding the connection is encountered.
+         * Disconnects the board.
+         */
         override fun onRunError(e: java.lang.Exception) {
             Log.e(LOG_TAG, "onRunError")
             liboard.disconnect()
@@ -197,12 +255,18 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
 
     }
 
+    /**
+     * Creates a new [Connection].
+     */
     fun connect() {
         if (isConnected) disconnect()
         connection = Connection(activity, this)
         eventHandler.onConnect()
     }
 
+    /**
+     * Closes and unregisters the current [Connection].
+     */
     fun disconnect() {
         connection?.close()
         connection = null
@@ -211,6 +275,9 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     //endregion
 
     //region Interfaces&Exceptions
+    /**
+     * Handler for game starts, moves and connection related events.
+     */
     internal interface EventHandler {
         fun onGameStart()
         fun onMove()
