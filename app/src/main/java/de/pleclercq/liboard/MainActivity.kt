@@ -11,18 +11,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import de.pleclercq.liboard.databinding.ActivityMainBinding
 
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     private val liBoard = LiBoard(this, this)
+    private lateinit var binding: ActivityMainBinding
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         attemptConnect()
     }
 
@@ -34,23 +35,23 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     //region LiBoard.EventHandler
     override fun onGameStart() {
-        runOnUiThread { textbox.text = liBoard.board.toString() }
+        runOnUiThread { binding.textbox.text = liBoard.board.toString() }
     }
 
     override fun onMove() {
-        runOnUiThread { textbox.text = liBoard.board.toString() }
+        runOnUiThread { binding.textbox.text = liBoard.board.toString() }
     }
 
     override fun onConnect() {
         runOnUiThread {
-            button.text = getString(R.string.disconnect)
+            binding.button.text = getString(R.string.disconnect)
             Toast.makeText(this, "LiBoard connected", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onDisconnect() {
         runOnUiThread {
-            button.text = getString(R.string.connect)
+            binding.button.text = getString(R.string.connect)
             Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
         }
     }
