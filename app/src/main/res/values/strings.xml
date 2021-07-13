@@ -2,4 +2,5 @@
     <string name="app_name">LiBoard</string>
     <string name="disconnect">Disconnect</string>
     <string name="connect">Connect</string>
+    <string name="ready">Ready</string>
 </resources>
