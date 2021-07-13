@@ -75,7 +75,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     private fun generateMove(): Boolean {
         val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
         val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
-        val temporarilyLiftedPieces = liftedPieces.minus(physicalPosition.occupiedSquares)
+        val temporarilyLiftedPieces = liftedPieces.intersect(physicalPosition.occupiedSquares)
 
         if (disappearances.size == 1 && appearances.size == 1) {
             // normal move
