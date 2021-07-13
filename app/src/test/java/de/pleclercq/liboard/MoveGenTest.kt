@@ -3,7 +3,6 @@ package de.pleclercq.liboard
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Square
 import org.junit.Test
-
 import org.junit.Assert.*
 
 class MoveGenTest {
