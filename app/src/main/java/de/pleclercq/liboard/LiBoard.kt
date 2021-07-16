@@ -31,6 +31,10 @@ import java.util.concurrent.Executors
  *
  * @param activity The [Activity] this object belongs to. Required for access to system services, permissions etc.
  * @param eventHandler A [EventHandler] that is used to react to game starts, moves and connection related events.
+ *
+ * @property knownPosition The physical position matching [board].
+ * @property physicalPosition The current physical position.
+ * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
 internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) : BoardEventListener {
@@ -50,6 +54,9 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     //region Position
     /**
      * Represents a physical board position.
+     *
+     * @property bytes The raw board data as a [List].
+     * @property occupiedSquares A [Set] of the indices of the occupied squares.
      */
     internal class PhysicalPosition(_bytes: Collection<UByte>) {
         val occupiedSquares: Set<Int>
@@ -282,9 +289,29 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
      * Handler for game starts, moves and connection related events.
      */
     internal interface EventHandler {
+        /**
+         * Called when a new game starts.
+         */
         fun onGameStart()
+
+        /**
+         * Called when a legal move is detected.
+         */
         fun onMove()
+
+        /**
+         * Called when the physical board position changes.
+         */
+        fun onNewPhysicalPosition()
+
+        /**
+         * Called when a LiBoard is connected.
+         */
         fun onConnect()
+
+        /**
+         * Called when the LiBoard is disconnected.
+         */
         fun onDisconnect()
     }
 
