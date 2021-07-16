@@ -197,13 +197,10 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             Log.v(LOG_TAG, "New data: $_data")
             data.addAll(_data.toUByteArray())
             if (data.size >= 8) {
-                val positionBytes = LinkedList<UByte>()
-                for (i in 0 until 8) {
-                    val b = data.poll()
-                    if (b != null)
-                        positionBytes.add(b)
-                }
-                liboard.onNewPhysicalPosition(PhysicalPosition(positionBytes))
+                var bitboard = 0UL
+                for (i in 7 downTo 0)
+                    bitboard = bitboard or (data.poll()!!.toULong() shl (8 * i))
+                liboard.onNewPhysicalPosition(PhysicalPosition(bitboard))
             }
         }
 
@@ -276,6 +273,5 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     internal abstract class ConnectionException(str: String) : Exception(str)
     internal class MissingDriverException(str: String) : ConnectionException(str)
     internal class UsbPermissionException(str: String) : ConnectionException(str)
-    internal class LiBoardInvalidPositionError(str: String) : Exception(str)
     //endregion
 }
