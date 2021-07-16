@@ -8,6 +8,7 @@
 package de.pleclercq.liboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +41,10 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     override fun onMove() {
         runOnUiThread { binding.textbox.text = liBoard.board.toString() }
+    }
+
+    override fun onNewPhysicalPosition() {
+        Log.d("onNewPhysicalPosition", "${liBoard.physicalPosition}")
     }
 
     override fun onConnect() {

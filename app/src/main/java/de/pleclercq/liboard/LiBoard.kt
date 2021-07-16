@@ -35,8 +35,10 @@ import java.util.concurrent.Executors
 @ExperimentalUnsignedTypes
 internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) : BoardEventListener {
     lateinit var board: Board
-    private var knownPosition = Position.STARTING_POSITION
-    private var physicalPosition = Position.STARTING_POSITION
+        private set
+    private var knownPosition = PhysicalPosition.STARTING_POSITION
+    internal var physicalPosition = PhysicalPosition.STARTING_POSITION
+        private set
     private val liftedPieces = HashSet<Int>()
     private var connection: Connection? = null
     val isConnected get() = connection != null
@@ -49,7 +51,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     /**
      * Represents a physical board position.
      */
-    private class Position(_bytes: Collection<UByte>) {
+    internal class PhysicalPosition(_bytes: Collection<UByte>) {
         val occupiedSquares: Set<Int>
         val bytes: List<UByte>
 
@@ -71,7 +73,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         }
 
         override fun equals(other: Any?): Boolean {
-            return if (other is Position) {
+            return if (other is PhysicalPosition) {
                 bytes == other.bytes
             } else super.equals(other)
         }
@@ -81,7 +83,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         }
 
         companion object {
-            val STARTING_POSITION = Position(ubyteArrayOf(0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U))
+            val STARTING_POSITION = PhysicalPosition(ubyteArrayOf(0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U, 0xC3U))
         }
     }
 
@@ -137,14 +139,15 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
      * Resets the board to the starting position if necessary
      * or tries to find a legal move matching the position otherwise.
      */
-    private fun onNewPosition(position: Position) {
+    private fun onNewPhysicalPosition(position: PhysicalPosition) {
+        eventHandler.onNewPhysicalPosition()
         physicalPosition = position
-        if (position == Position.STARTING_POSITION) {
+        if (position == PhysicalPosition.STARTING_POSITION) {
             newBoard()
             updateKnownPosition()
             eventHandler.onGameStart()
         } else {
-            liftedPieces.addAll(knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares))
+            liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
             generateMove()
         }
     }
@@ -223,7 +226,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
 
         /**
          * Handles incoming data.
-         * calls [onNewPosition] when enough data (8 bytes) came in.
+         * Calls [onNewPhysicalPosition] when enough data (8 bytes) came in.
          */
         override fun onNewData(_data: ByteArray) {
             Log.v(LOG_TAG, "New data: $_data")
@@ -235,7 +238,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
                     if (b != null)
                         positionBytes.add(b)
                 }
-                liboard.onNewPosition(Position(positionBytes))
+                liboard.onNewPhysicalPosition(PhysicalPosition(positionBytes))
             }
         }
 
