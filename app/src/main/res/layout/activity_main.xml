@@ -19,6 +19,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!--Replace with FloatingActionButton-->
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"

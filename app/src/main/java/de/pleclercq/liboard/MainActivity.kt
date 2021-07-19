@@ -49,14 +49,13 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     override fun onConnect() {
         runOnUiThread {
-            binding.button.text = getString(R.string.disconnect)
-            Toast.makeText(this, "LiBoard connected", Toast.LENGTH_SHORT).show()
+            binding.button.visibility = View.GONE
         }
     }
 
     override fun onDisconnect() {
         runOnUiThread {
-            binding.button.text = getString(R.string.connect)
+            binding.button.visibility = View.VISIBLE
             Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
         }
     }
