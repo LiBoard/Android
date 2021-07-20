@@ -14,16 +14,15 @@ import android.content.Intent
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.BoardEvent
-import com.github.bhlangonijr.chesslib.BoardEventListener
-import com.github.bhlangonijr.chesslib.BoardEventType
 import com.github.bhlangonijr.chesslib.game.Game
+import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
+import de.pleclercq.liboard.LiBoard.EventHandler
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.Executors
@@ -40,9 +39,10 @@ import java.util.concurrent.Executors
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
-internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) : BoardEventListener {
+internal class LiBoard(private val activity: Activity, private var eventHandler: EventHandler) {
     lateinit var board: Board
         private set
+    private val moveList = MoveList()
     private var knownPosition = PhysicalPosition.STARTING_POSITION
     internal var physicalPosition = PhysicalPosition.STARTING_POSITION
         private set
@@ -69,12 +69,12 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         if (disappearances.size == 1 && appearances.size == 1) {
             // normal move
             val m = board.findMove(disappearances.first(), appearances.first())
-            return m != null && !board.isCastling(m) && !board.isCapture(m) && board.doMove(m)
+            return m != null && !board.isCastling(m) && !board.isCapture(m) && tryMove(m)
         } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
             // "normal" capture (not e.p.)
             for (to in temporarilyLiftedPieces) {
                 val m = board.findMove(disappearances.first(), to)
-                if (m != null && board.isNormalCapture(m) && board.doMove(m))
+                if (m != null && board.isNormalCapture(m) && tryMove(m))
                     return true
             }
             return false
@@ -83,7 +83,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             for (from in disappearances) {
                 for (to in appearances) {
                     val m = board.findMove(from, to)
-                    if (m != null && board.isEnPassant(m) && board.doMove(m))
+                    if (m != null && board.isEnPassant(m) && tryMove(m))
                         return true
                 }
             }
@@ -93,7 +93,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
             for (from in disappearances) {
                 for (to in appearances) {
                     val m = board.findMove(from, to)
-                    if (m != null && board.isCastling(m) && board.doMove(m))
+                    if (m != null && board.isCastling(m) && tryMove(m))
                         return true
                 }
             }
@@ -121,20 +121,34 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     }
 
     /**
-     * Gets called when a move happens.
-     *  Calls [updateKnownPosition] and the [eventHandler]'s [EventHandler.onMove] function.
+     * Tries a move.
+     * Calls [onMove] and returns true if successful.
      */
-    override fun onEvent(event: BoardEvent) {
+    private fun tryMove(move: Move): Boolean {
+        if (board.doMove(move)) {
+            onMove(move)
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Called when a new [Move] is detected.
+     * Updates the [knownPosition], adds the [move] to the [moveList]
+     * and calls [eventHandler]'s [EventHandler.onMove].
+     */
+    private fun onMove(move: Move) {
         updateKnownPosition()
+        moveList.addLast(move)
         eventHandler.onMove()
     }
 
     /**
-     * Creates a new [Board] and registers the [BoardEventListener].
+     * Creates a new [Board] and clears the [moveList].
      */
     private fun newGame() {
         board = Board()
-        board.addEventListener(BoardEventType.ON_MOVE, this)
+        moveList.clear()
     }
 
     /**
