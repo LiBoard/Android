@@ -11,9 +11,13 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Square
+import com.github.bhlangonijr.chesslib.game.Event
+import com.github.bhlangonijr.chesslib.game.Game
+import com.github.bhlangonijr.chesslib.game.Round
 import com.github.bhlangonijr.chesslib.move.Move
 import kotlin.math.abs
 
+//region Board
 /**
  * Check if a move is a capture ("normal" or en passant).
  */
@@ -50,3 +54,11 @@ fun Board.findMove(from: Square, to: Square) = legalMoves().firstOrNull { m -> m
  * In case of a promotion, [Board.legalMoves] always returns the promotion to a Queen first.
  */
 fun Board.findMove(from: Int, to: Int) = findMove(Square.squareAt(from), Square.squareAt(to))
+//endregion
+
+//region Game
+/**
+ * Creates a [Game] with an empty ID and no [Round]/[Event] information.
+ */
+fun Game() = Game("", Round(Event()))
+//endregion

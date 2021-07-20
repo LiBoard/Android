@@ -17,6 +17,8 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.BoardEvent
 import com.github.bhlangonijr.chesslib.BoardEventListener
 import com.github.bhlangonijr.chesslib.BoardEventType
+import com.github.bhlangonijr.chesslib.game.Game
+import com.github.bhlangonijr.chesslib.move.MoveList
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver
 import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
@@ -49,7 +51,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     val isConnected get() = connection != null
 
     init {
-        newBoard()
+        newGame()
     }
 
     //region Position
@@ -109,7 +111,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         eventHandler.onNewPhysicalPosition()
         physicalPosition = position
         if (position == PhysicalPosition.STARTING_POSITION) {
-            newBoard()
+            newGame()
             updateKnownPosition()
             eventHandler.onGameStart()
         } else {
@@ -130,7 +132,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     /**
      * Creates a new [Board] and registers the [BoardEventListener].
      */
-    private fun newBoard() {
+    private fun newGame() {
         board = Board()
         board.addEventListener(BoardEventType.ON_MOVE, this)
     }
@@ -141,6 +143,34 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     private fun updateKnownPosition() {
         knownPosition = physicalPosition
         liftedPieces.clear()
+    }
+
+    /**
+     * Export a [Game] with the played moves.
+     */
+    fun exportGame(): Game {
+        val game = Game()
+        game.halfMoves = getMoveList()
+        return game
+    }
+
+    /**
+     * Creates a [MoveList] from the current [Board].
+     */
+    private fun getMoveList(): MoveList {
+        val moveList = MoveList()
+
+        // Fill moveList by rewinding board to the beginning.
+        var move = board.undoMove()
+        while (move != null) {
+            moveList.addFirst(move)
+            move = board.undoMove()
+        }
+
+        // Recreate board position
+        for (m in moveList) board.doMove(m)
+
+        return moveList
     }
     //endregion
 
