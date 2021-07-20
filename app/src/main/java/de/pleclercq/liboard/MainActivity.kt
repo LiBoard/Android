@@ -14,6 +14,8 @@ import android.content.IntentFilter
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -41,6 +43,11 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         liBoard.disconnect()
         super.onDestroy()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.action_bar, menu)
+        return true
+    }
     //endregion
 
     //region LiBoard.EventHandler
@@ -67,6 +74,17 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
             binding.connectFab.show()
             Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
         }
+    }
+    //endregion
+
+    //region UI events
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.export_game -> Toast.makeText(this, "Game export is not yet implemented.", Toast.LENGTH_SHORT).show()
+            R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
+            else -> return false
+        }
+        return true
     }
     //endregion
 

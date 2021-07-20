@@ -3,4 +3,6 @@
     <string name="disconnect">Disconnect</string>
     <string name="connect">Connect</string>
     <string name="ready">Ready</string>
+    <string name="credits">Credits</string>
+    <string name="export_game">Export game</string>
 </resources>
