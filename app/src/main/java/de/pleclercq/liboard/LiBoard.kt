@@ -160,31 +160,12 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
     }
 
     /**
-     * Export a [Game] with the played moves.
+     * Export a [Game] with the [Move]s in [moveList].
      */
     fun exportGame(): Game {
         val game = Game()
-        game.halfMoves = getMoveList()
+        game.halfMoves = moveList
         return game
-    }
-
-    /**
-     * Creates a [MoveList] from the current [Board].
-     */
-    private fun getMoveList(): MoveList {
-        val moveList = MoveList()
-
-        // Fill moveList by rewinding board to the beginning.
-        var move = board.undoMove()
-        while (move != null) {
-            moveList.addFirst(move)
-            move = board.undoMove()
-        }
-
-        // Recreate board position
-        for (m in moveList) board.doMove(m)
-
-        return moveList
     }
     //endregion
 
