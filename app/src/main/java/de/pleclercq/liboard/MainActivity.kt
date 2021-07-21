@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     }
 
     override fun onDestroy() {
+        unregisterReceiver(usbPermissionReceiver)
         liBoard.disconnect()
         super.onDestroy()
     }
