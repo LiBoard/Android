@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/export_game"
-        android:icon="@drawable/save"
+        android:icon="@drawable/ic_outline_save_24"
         android:title="@string/export_game"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/credits"
-        android:icon="@drawable/attribution"
+        android:icon="@drawable/ic_outline_attribution_24"
         android:title="@string/credits"
         app:showAsAction="never" />
 </menu>
