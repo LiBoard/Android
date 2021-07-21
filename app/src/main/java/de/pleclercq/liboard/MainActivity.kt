@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         })
     } catch (e: Exception) {
         Log.w("exportGame", e)
-        Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
     }
     //endregion
 
