@@ -12,14 +12,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbManager
+import android.net.Uri
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
+import java.io.FileOutputStream
 
 
 @ExperimentalUnsignedTypes
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     private val liBoard = LiBoard(this, this)
     private lateinit var binding: ActivityMainBinding
     private val usbPermissionReceiver = UsbPermissionReceiver()
+    private val createDocument = registerForActivityResult(ActivityResultContracts.CreateDocument()) { saveGame(it) }
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +84,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.export_game -> exportGame()
+            R.id.export_game -> createDocument.launch("Unnamed.pgn")
             //TODO implement credits
             R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
             else -> return false
@@ -91,12 +95,12 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     /**
      * Exports a game by sending it as an [Intent].
      */
-    private fun exportGame() = try {
-        startActivity(Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, liBoard.exportGame().toPgn(true, true))
-            type = "application/x-chess-pgn"
-        })
+    private fun saveGame(uri: Uri) = try {
+        contentResolver.openFileDescriptor(uri, "w")?.use { pfd: ParcelFileDescriptor ->
+            FileOutputStream(pfd.fileDescriptor).use { fos: FileOutputStream ->
+                fos.write(liBoard.exportGame().toPgn(true, true).toByteArray())
+            }
+        }
     } catch (e: Exception) {
         Log.w("exportGame", e)
         Toast.makeText(this, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
