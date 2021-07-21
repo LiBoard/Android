@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.connectFab.setOnClickListener { attemptConnect() }
         setContentView(binding.root)
         registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
         attemptConnect()
@@ -57,21 +58,16 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     override fun onConnect() {
         runOnUiThread {
-            binding.button.visibility = View.GONE
+            binding.connectFab.hide()
         }
     }
 
     override fun onDisconnect() {
         runOnUiThread {
-            binding.button.visibility = View.VISIBLE
+            binding.connectFab.show()
             Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
         }
     }
-    //endregion
-
-    //region UI events
-    @Suppress("UNUSED_PARAMETER")
-    fun onConnectButtonPressed(view: View) = if (liBoard.isConnected) liBoard.disconnect() else attemptConnect()
     //endregion
 
     private fun attemptConnect() {

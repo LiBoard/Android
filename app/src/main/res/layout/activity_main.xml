@@ -20,15 +20,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--Replace with FloatingActionButton-->
-    <Button
-        android:id="@+id/button"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/connect_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:onClick="onConnectButtonPressed"
-        android:text="@string/connect"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        android:src="@drawable/ic_outline_link_24"
+        android:contentDescription="@string/connect"
+        android:layout_margin="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
