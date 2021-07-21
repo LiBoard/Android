@@ -91,11 +91,16 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     /**
      * Exports a game by sending it as an [Intent].
      */
-    private fun exportGame() = startActivity(Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, liBoard.exportGame().toPgn(true, true))
-        type = "application/x-chess-pgn"
-    })
+    private fun exportGame() = try {
+        startActivity(Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, liBoard.exportGame().toPgn(true, true))
+            type = "application/x-chess-pgn"
+        })
+    } catch (e: Exception) {
+        Log.w("exportGame", e)
+        Toast.makeText(this, "An error occurred", Toast.LENGTH_SHORT).show()
+    }
     //endregion
 
     private fun attemptConnect() {

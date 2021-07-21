@@ -11,10 +11,9 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.game.Event
-import com.github.bhlangonijr.chesslib.game.Game
-import com.github.bhlangonijr.chesslib.game.Round
+import com.github.bhlangonijr.chesslib.game.*
 import com.github.bhlangonijr.chesslib.move.Move
+import java.lang.StringBuilder
 import kotlin.math.abs
 
 //region Board
@@ -58,7 +57,20 @@ fun Board.findMove(from: Int, to: Int) = findMove(Square.squareAt(from), Square.
 
 //region Game
 /**
- * Creates a [Game] with an empty ID and no [Round]/[Event] information.
+ * Creates a [Game] no information.
  */
-fun Game() = Game("", Round(Event()))
+fun Game(): Game {
+    return Game("",
+        Round(Event().apply {
+            name = ""
+            site = ""
+            startDate = ""
+        }).apply { number = 1 }).apply {
+        whitePlayer = GenericPlayer("", "")
+        blackPlayer = GenericPlayer("", "")
+        result = GameResult.ONGOING
+        plyCount = ""
+        moveText = StringBuilder()
+    }
+}
 //endregion
