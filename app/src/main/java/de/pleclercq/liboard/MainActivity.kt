@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     }
     //endregion
 
-    //region LiBoard.EventHandler
+    //region LiBoard
     override fun onGameStart() {
         runOnUiThread { binding.textbox.text = liBoard.board.toString() }
     }
@@ -80,12 +80,22 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.export_game -> Toast.makeText(this, "Game export is not yet implemented.", Toast.LENGTH_SHORT).show()
+            R.id.export_game -> exportGame()
+            //TODO implement credits
             R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
             else -> return false
         }
         return true
     }
+
+    /**
+     * Exports a game by sending it as an [Intent].
+     */
+    private fun exportGame() = startActivity(Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, liBoard.exportGame().toPgn(true, true))
+        type = "application/x-chess-pgn"
+    })
     //endregion
 
     private fun attemptConnect() {
