@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     private val liBoard = LiBoard(this, this)
     private lateinit var binding: ActivityMainBinding
     private val usbPermissionReceiver = UsbPermissionReceiver()
-    private val createDocument = registerForActivityResult(MyCreateDocument()) { saveGame(it) }
+    private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.export_game -> createDocument.launch("application/x-chess-pgn")
+            R.id.export_game -> createDocument.launch("unnamed.pgn")
             //TODO implement credits
             R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
             else -> return false
@@ -132,10 +132,11 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         }
     }
 
-    private class MyCreateDocument : ActivityResultContract<String, Uri>() {
+    private class CreatePgnDocument : ActivityResultContract<String, Uri>() {
         override fun createIntent(context: Context, input: String?) = Intent().apply {
             action = Intent.ACTION_CREATE_DOCUMENT
-            type = input
+            type = "application/x-chess-pgn"
+            putExtra(Intent.EXTRA_TITLE, input)
         }
 
         override fun parseResult(resultCode: Int, intent: Intent?) =
