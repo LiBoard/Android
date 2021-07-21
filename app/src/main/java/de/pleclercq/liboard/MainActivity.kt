@@ -7,6 +7,11 @@
 
 package de.pleclercq.liboard
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,12 +24,14 @@ import de.pleclercq.liboard.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     private val liBoard = LiBoard(this, this)
     private lateinit var binding: ActivityMainBinding
+    private val usbPermissionReceiver = UsbPermissionReceiver()
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
         attemptConnect()
     }
 
@@ -70,9 +77,23 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         try {
             liBoard.connect()
         } catch (e: LiBoard.MissingDriverException) {
+            Log.d("attemptConnect", e::class.simpleName!!)
             Toast.makeText(this, "No Board connected", Toast.LENGTH_SHORT).show()
         } catch (e: LiBoard.UsbPermissionException) {
-            Toast.makeText(this, "No USB Permission", Toast.LENGTH_SHORT).show()
+            Log.d("attemptConnect", e::class.simpleName!!)
+        }
+    }
+
+    internal class UsbPermissionReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (context is MainActivity && intent != null && intent.action == ACTION
+                && intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
+            )
+                context.attemptConnect()
+        }
+
+        companion object {
+            const val ACTION = "de.pleclercq.liboard.USB_PERMISSION_GRANTED"
         }
     }
 }

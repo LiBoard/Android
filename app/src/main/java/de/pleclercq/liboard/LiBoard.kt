@@ -10,6 +10,7 @@ package de.pleclercq.liboard
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.hardware.usb.UsbManager
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
@@ -163,23 +164,26 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
 
             // Open a connection to the first available driver.
             val driver = availableDrivers.first()
-            val connection = usbManager.openDevice(driver.device)
-            if (connection == null) {
+            if (!usbManager.hasPermission(driver.device)) {
                 usbManager.requestPermission(
-                    driver.device, PendingIntent.getActivity(
-                        activity, 0,
-                        activity.intent, 0
+                    driver.device,
+                    PendingIntent.getBroadcast(
+                        activity,
+                        0,
+                        Intent().apply { action = MainActivity.UsbPermissionReceiver.ACTION },
+                        0
                     )
                 )
                 throw UsbPermissionException("No Usb permission")
+            } else {
+                val connection = usbManager.openDevice(driver.device)
+                port = driver.ports.first()
+                port.open(connection)
+                port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+                port.dtr = true
+
+                Executors.newSingleThreadExecutor().submit(SerialInputOutputManager(port, this))
             }
-
-            port = driver.ports.first()
-            port.open(connection)
-            port.setParameters(9600, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-            port.dtr = true
-
-            Executors.newSingleThreadExecutor().submit(SerialInputOutputManager(port, this))
         }
 
         /**
