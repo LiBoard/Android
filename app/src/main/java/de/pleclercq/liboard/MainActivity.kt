@@ -7,6 +7,7 @@
 
 package de.pleclercq.liboard
 
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,7 +20,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 import java.io.FileOutputStream
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     private val liBoard = LiBoard(this, this)
     private lateinit var binding: ActivityMainBinding
     private val usbPermissionReceiver = UsbPermissionReceiver()
-    private val createDocument = registerForActivityResult(ActivityResultContracts.CreateDocument()) { saveGame(it) }
+    private val createDocument = registerForActivityResult(MyCreateDocument()) { saveGame(it) }
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.export_game -> createDocument.launch("Unnamed.pgn")
+            R.id.export_game -> createDocument.launch("application/x-chess-pgn")
             //TODO implement credits
             R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
             else -> return false
@@ -129,5 +130,16 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         companion object {
             const val ACTION = "de.pleclercq.liboard.USB_PERMISSION_GRANTED"
         }
+    }
+
+    private class MyCreateDocument : ActivityResultContract<String, Uri>() {
+        override fun createIntent(context: Context, input: String?) = Intent().apply {
+            action = Intent.ACTION_CREATE_DOCUMENT
+            type = input
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?) =
+            if (intent == null || resultCode != Activity.RESULT_OK) null
+            else intent.data
     }
 }
