@@ -6,12 +6,12 @@ import android.content.Intent
 import android.hardware.usb.UsbManager
 
 @ExperimentalUnsignedTypes
-internal class UsbPermissionReceiver : BroadcastReceiver() {
+internal class UsbPermissionReceiver(private val callback: Runnable) : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (context is MainActivity && intent != null && intent.action == ACTION
+        if (intent != null && intent.action == ACTION
             && intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
         )
-            context.attemptConnect()
+            callback.run()
     }
 
     companion object {

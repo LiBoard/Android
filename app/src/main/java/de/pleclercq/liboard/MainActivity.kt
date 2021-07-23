@@ -7,27 +7,20 @@
 
 package de.pleclercq.liboard
 
-import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.os.Bundle
-import android.os.ParcelFileDescriptor
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
-import java.io.FileOutputStream
 
 
 @ExperimentalUnsignedTypes
-class MainActivity : AppCompatActivity(), LiBoardEventHandler {
-    private val liBoard = LiBoard(this, this)
-    private lateinit var binding: ActivityMainBinding
-    private val usbPermissionReceiver = UsbPermissionReceiver()
-    private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
+class MainActivity : AppCompatActivity() {
     private val gameFragment = GameFragment(this)
+    private lateinit var binding: ActivityMainBinding
+    private val usbPermissionReceiver = UsbPermissionReceiver { gameFragment.attemptConnect() }
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,54 +28,23 @@ class MainActivity : AppCompatActivity(), LiBoardEventHandler {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportFragmentManager.beginTransaction().add(binding.mainFragmentContainerView.id, gameFragment).commit()
-
         registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
-        attemptConnect()
     }
 
     override fun onDestroy() {
         unregisterReceiver(usbPermissionReceiver)
-        liBoard.disconnect()
         super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.action_bar, menu)
+        menuInflater.inflate(R.menu.activity_main, menu)
         return true
-    }
-    //endregion
-
-    //region LiBoard
-    override fun onGameStart() {
-        runOnUiThread { gameFragment.binding.textbox.text = liBoard.board.toString() }
-    }
-
-    override fun onMove() {
-        runOnUiThread { gameFragment.binding.textbox.text = liBoard.board.toString() }
-    }
-
-    override fun onNewPhysicalPosition() {
-        Log.d("onNewPhysicalPosition", "${liBoard.physicalPosition}")
-    }
-
-    override fun onConnect() {
-        runOnUiThread {
-            gameFragment.binding.connectFab.hide()
-        }
-    }
-
-    override fun onDisconnect() {
-        runOnUiThread {
-            gameFragment.binding.connectFab.show()
-            Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
-        }
     }
     //endregion
 
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.export_game -> createDocument.launch("unnamed.pgn")
             //TODO implement credits
             R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
             else -> return false
@@ -90,29 +52,4 @@ class MainActivity : AppCompatActivity(), LiBoardEventHandler {
         return true
     }
     //endregion
-
-    internal fun attemptConnect() {
-        try {
-            liBoard.connect()
-        } catch (e: Connection.MissingDriverException) {
-            Log.d("attemptConnect", e::class.simpleName!!)
-            Toast.makeText(this, "No Board connected", Toast.LENGTH_SHORT).show()
-        } catch (e: Connection.UsbPermissionException) {
-            Log.d("attemptConnect", e::class.simpleName!!)
-        }
-    }
-
-    /**
-     * Exports a game by sending it as an [Intent].
-     */
-    private fun saveGame(uri: Uri) = try {
-        contentResolver.openFileDescriptor(uri, "w")?.use { pfd: ParcelFileDescriptor ->
-            FileOutputStream(pfd.fileDescriptor).use { fos: FileOutputStream ->
-                fos.write(liBoard.exportGame().toPgn(true, true).toByteArray())
-            }
-        }
-    } catch (e: Exception) {
-        Log.w("exportGame", e)
-        Toast.makeText(this, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
-    }
 }
