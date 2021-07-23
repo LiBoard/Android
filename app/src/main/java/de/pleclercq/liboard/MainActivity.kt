@@ -7,12 +7,8 @@
 
 package de.pleclercq.liboard
 
-import android.app.Activity
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.hardware.usb.UsbManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
@@ -20,25 +16,26 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 import java.io.FileOutputStream
 
 
 @ExperimentalUnsignedTypes
-class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
+class MainActivity : AppCompatActivity(), LiBoardEventHandler {
     private val liBoard = LiBoard(this, this)
     private lateinit var binding: ActivityMainBinding
     private val usbPermissionReceiver = UsbPermissionReceiver()
     private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
+    private val gameFragment = GameFragment(this)
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        binding.connectFab.setOnClickListener { attemptConnect() }
         setContentView(binding.root)
+        supportFragmentManager.beginTransaction().add(binding.mainFragmentContainerView.id, gameFragment).commit()
+
         registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
         attemptConnect()
     }
@@ -57,11 +54,11 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     //region LiBoard
     override fun onGameStart() {
-        runOnUiThread { binding.textbox.text = liBoard.board.toString() }
+        runOnUiThread { gameFragment.binding.textbox.text = liBoard.board.toString() }
     }
 
     override fun onMove() {
-        runOnUiThread { binding.textbox.text = liBoard.board.toString() }
+        runOnUiThread { gameFragment.binding.textbox.text = liBoard.board.toString() }
     }
 
     override fun onNewPhysicalPosition() {
@@ -70,13 +67,13 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
 
     override fun onConnect() {
         runOnUiThread {
-            binding.connectFab.hide()
+            gameFragment.binding.connectFab.hide()
         }
     }
 
     override fun onDisconnect() {
         runOnUiThread {
-            binding.connectFab.show()
+            gameFragment.binding.connectFab.show()
             Toast.makeText(this, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
         }
     }
@@ -92,6 +89,18 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
         }
         return true
     }
+    //endregion
+
+    internal fun attemptConnect() {
+        try {
+            liBoard.connect()
+        } catch (e: Connection.MissingDriverException) {
+            Log.d("attemptConnect", e::class.simpleName!!)
+            Toast.makeText(this, "No Board connected", Toast.LENGTH_SHORT).show()
+        } catch (e: Connection.UsbPermissionException) {
+            Log.d("attemptConnect", e::class.simpleName!!)
+        }
+    }
 
     /**
      * Exports a game by sending it as an [Intent].
@@ -105,42 +114,5 @@ class MainActivity : AppCompatActivity(), LiBoard.EventHandler {
     } catch (e: Exception) {
         Log.w("exportGame", e)
         Toast.makeText(this, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
-    }
-    //endregion
-
-    private fun attemptConnect() {
-        try {
-            liBoard.connect()
-        } catch (e: LiBoard.MissingDriverException) {
-            Log.d("attemptConnect", e::class.simpleName!!)
-            Toast.makeText(this, "No Board connected", Toast.LENGTH_SHORT).show()
-        } catch (e: LiBoard.UsbPermissionException) {
-            Log.d("attemptConnect", e::class.simpleName!!)
-        }
-    }
-
-    internal class UsbPermissionReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (context is MainActivity && intent != null && intent.action == ACTION
-                && intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
-            )
-                context.attemptConnect()
-        }
-
-        companion object {
-            const val ACTION = "de.pleclercq.liboard.USB_PERMISSION_GRANTED"
-        }
-    }
-
-    private class CreatePgnDocument : ActivityResultContract<String, Uri>() {
-        override fun createIntent(context: Context, input: String?) = Intent().apply {
-            action = Intent.ACTION_CREATE_DOCUMENT
-            type = "application/x-chess-pgn"
-            putExtra(Intent.EXTRA_TITLE, input)
-        }
-
-        override fun parseResult(resultCode: Int, intent: Intent?) =
-            if (intent == null || resultCode != Activity.RESULT_OK) null
-            else intent.data
     }
 }
