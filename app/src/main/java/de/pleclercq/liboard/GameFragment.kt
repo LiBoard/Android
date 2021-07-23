@@ -26,7 +26,9 @@ internal class GameFragment(private val activity: MainActivity) : Fragment(),
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentGameBinding.inflate(inflater, container, false)
+        if (liBoard.isConnected) binding.connectFab.hide()
         binding.connectFab.setOnClickListener { attemptConnect() }
+        binding.textbox.text = liBoard.board.toString()
         return binding.root
     }
 

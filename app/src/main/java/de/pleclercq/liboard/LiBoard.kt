@@ -170,9 +170,11 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
      * Closes and unregisters the current [Connection].
      */
     fun disconnect() {
-        connection?.close()
-        connection = null
-        eventHandler.onDisconnect()
+        if (connection != null) {
+            connection?.close()
+            connection = null
+            eventHandler.onDisconnect()
+        }
     }
     //endregion
 }

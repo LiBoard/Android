@@ -11,7 +11,6 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 
@@ -19,6 +18,7 @@ import de.pleclercq.liboard.databinding.ActivityMainBinding
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
     private val gameFragment = GameFragment(this)
+    private val creditsFragment = CreditsFragment(this)
     private lateinit var binding: ActivityMainBinding
     private val usbPermissionReceiver = UsbPermissionReceiver { gameFragment.attemptConnect() }
 
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportFragmentManager.beginTransaction().add(binding.mainFragmentContainerView.id, gameFragment).commit()
+        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, gameFragment).commit()
         registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
     }
 
@@ -45,8 +45,9 @@ class MainActivity : AppCompatActivity() {
     //region UI events
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            //TODO implement credits
-            R.id.credits -> Toast.makeText(this, "Credits are not yet implemented.", Toast.LENGTH_SHORT).show()
+            R.id.credits -> supportFragmentManager.beginTransaction()
+                .replace(R.id.main_fragment_container_view, creditsFragment).addToBackStack("credits").commit()
+
             else -> return false
         }
         return true
