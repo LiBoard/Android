@@ -1,4 +1,4 @@
-package de.pleclercq.liboard
+package de.pleclercq.liboard.liboard
 
 import android.app.Activity
 import android.app.PendingIntent
@@ -11,6 +11,7 @@ import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
+import de.pleclercq.liboard.UsbPermissionReceiver
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.Executors

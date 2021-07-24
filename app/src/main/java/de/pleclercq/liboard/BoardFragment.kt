@@ -9,10 +9,13 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import de.pleclercq.liboard.databinding.FragmentGameBinding
+import de.pleclercq.liboard.liboard.Connection
+import de.pleclercq.liboard.liboard.LiBoard
+import de.pleclercq.liboard.liboard.LiBoardEventHandler
 import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
-internal class GameFragment(private val activity: MainActivity) : Fragment(),
+internal class BoardFragment(private val activity: MainActivity) : Fragment(),
     LiBoardEventHandler {
     private val liBoard = LiBoard(activity, this)
     private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }

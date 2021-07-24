@@ -1,4 +1,4 @@
-package de.pleclercq.liboard
+package de.pleclercq.liboard.liboard
 
 /**
  * Handler for game starts, moves and connection related events.

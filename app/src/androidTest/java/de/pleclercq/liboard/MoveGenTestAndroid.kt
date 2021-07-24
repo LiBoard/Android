@@ -10,6 +10,7 @@ package de.pleclercq.liboard
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Square
+import de.pleclercq.liboard.liboard.findMove
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test

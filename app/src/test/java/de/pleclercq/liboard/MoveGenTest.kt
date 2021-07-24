@@ -9,6 +9,7 @@ package de.pleclercq.liboard
 
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Square
+import de.pleclercq.liboard.liboard.findMove
 import org.junit.Test
 import org.junit.Assert.*
 

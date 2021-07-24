@@ -1,5 +1,6 @@
 package de.pleclercq.liboard
 
+import de.pleclercq.liboard.liboard.PhysicalPosition
 import org.junit.Test
 
 @ExperimentalUnsignedTypes

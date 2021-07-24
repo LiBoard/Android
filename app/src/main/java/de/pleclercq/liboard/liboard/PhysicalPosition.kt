@@ -1,4 +1,4 @@
-package de.pleclercq.liboard
+package de.pleclercq.liboard.liboard
 
 /**
  * Represents a physical board position.

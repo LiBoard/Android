@@ -17,17 +17,17 @@ import de.pleclercq.liboard.databinding.ActivityMainBinding
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
-    private val gameFragment = GameFragment(this)
+    private val boardFragment = BoardFragment(this)
     private val creditsFragment = CreditsFragment(this)
     private lateinit var binding: ActivityMainBinding
-    private val usbPermissionReceiver = UsbPermissionReceiver { gameFragment.attemptConnect() }
+    private val usbPermissionReceiver = UsbPermissionReceiver { boardFragment.attemptConnect() }
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, gameFragment).commit()
+        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, boardFragment).commit()
         registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
     }
 

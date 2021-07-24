@@ -5,7 +5,7 @@
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version. */
 
-package de.pleclercq.liboard
+package de.pleclercq.liboard.liboard
 
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
