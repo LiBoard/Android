@@ -13,6 +13,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
+import de.pleclercq.liboard.fragments.BoardFragment
+import de.pleclercq.liboard.fragments.CreditsFragment
 
 
 @ExperimentalUnsignedTypes

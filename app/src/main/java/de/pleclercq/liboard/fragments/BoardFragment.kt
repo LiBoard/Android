@@ -1,4 +1,4 @@
-package de.pleclercq.liboard
+package de.pleclercq.liboard.fragments
 
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +8,9 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import de.pleclercq.liboard.CreatePgnDocument
+import de.pleclercq.liboard.MainActivity
+import de.pleclercq.liboard.R
 import de.pleclercq.liboard.databinding.FragmentGameBinding
 import de.pleclercq.liboard.liboard.Connection
 import de.pleclercq.liboard.liboard.LiBoard
