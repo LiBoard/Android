@@ -20,6 +20,16 @@ internal class PhysicalPosition(val bitboard: ULong) {
         return bitboard.hashCode()
     }
 
+    override fun toString(): String {
+        var s = ""
+        for (rank in 7 downTo 0) {
+            for (file in 0..7)
+                s += if (occupiedSquares.contains(rank * 8 + file)) "X" else "."
+            s += "\n"
+        }
+        return s
+    }
+
     companion object {
         val STARTING_POSITION = PhysicalPosition(0xFFFF00000000FFFFUL)
     }

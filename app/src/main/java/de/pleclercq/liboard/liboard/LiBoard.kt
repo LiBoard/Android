@@ -146,14 +146,7 @@ internal class LiBoard(private val activity: Activity, private var eventHandler:
         liftedPieces.clear()
     }
 
-    /**
-     * Export a [Game] with the [Move]s in [moveList].
-     */
-    fun exportGame(): Game {
-        val game = Game()
-        game.halfMoves = moveList
-        return game
-    }
+    fun getMoves() = MoveList(moveList)
     //endregion
 
     //region Connection

@@ -11,7 +11,7 @@ import de.pleclercq.liboard.R
 import de.pleclercq.liboard.databinding.FragmentCreditsBinding
 
 @ExperimentalUnsignedTypes
-internal class CreditsFragment(private val activity: MainActivity) : Fragment() {
+class CreditsFragment(private val activity: MainActivity) : Fragment() {
     private lateinit var binding: FragmentCreditsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

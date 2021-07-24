@@ -1,23 +1,49 @@
 package de.pleclercq.liboard.fragments
 
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayout
+import de.pleclercq.liboard.CreatePgnDocument
 import de.pleclercq.liboard.MainActivity
+import de.pleclercq.liboard.R
+import de.pleclercq.liboard.UsbPermissionReceiver
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
+import de.pleclercq.liboard.liboard.Connection
+import de.pleclercq.liboard.liboard.Game
+import de.pleclercq.liboard.liboard.LiBoard
+import de.pleclercq.liboard.liboard.LiBoardEventHandler
+import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
-internal class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout.OnTabSelectedListener {
+class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout.OnTabSelectedListener,
+    LiBoardEventHandler {
     private lateinit var binding: FragmentTabbedBinding
-    private val boardFragment = BoardFragment(activity)
+    private val liBoard = LiBoard(activity, this)
+    private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
+    private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
 
-    //region Lifecycle
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        activity.registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentTabbedBinding.inflate(inflater, container, false)
+
+        if (liBoard.isConnected) binding.connectFab.hide()
+        binding.connectFab.setOnClickListener { attemptConnect() }
+
         val tl = binding.tabLayout
         tl.addOnTabSelectedListener(this)
         for (tab in Tab.values())
@@ -25,18 +51,29 @@ internal class TabbedFragment(private val activity: MainActivity) : Fragment(), 
                 text = tab.title
                 tag = tab
             })
+
         return binding.root
+    }
+
+    override fun onDestroy() {
+        liBoard.disconnect()
+        activity.unregisterReceiver(usbPermissionReceiver)
+        super.onDestroy()
+    }
+    //endregion
+
+    //region UI events
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.export_game -> createDocument.launch("unnamed.pgn")
+            else -> return false
+        }
+        return true
     }
     //endregion
 
     //region OnTabSelectedListener
-    override fun onTabSelected(tab: TabLayout.Tab) {
-        when (tab.tag) {
-            Tab.BOARD -> activity.supportFragmentManager.beginTransaction()
-                .replace(binding.contentHolder.id, boardFragment).commit()
-            else -> Log.w("Unknown tab selected", "${tab.tag}")
-        }
-    }
+    override fun onTabSelected(tab: TabLayout.Tab) = updateTextBox()
 
     override fun onTabUnselected(tab: TabLayout.Tab) {
         Log.d("Tab unselected", "${tab.tag}")
@@ -46,6 +83,76 @@ internal class TabbedFragment(private val activity: MainActivity) : Fragment(), 
         Log.d("Tab reselected", "${tab.tag}")
     }
     //endregion
+
+    //region LiBoard
+    override fun onGameStart() {
+        activity.runOnUiThread { updateTextBox() }
+    }
+
+    override fun onMove() {
+        activity.runOnUiThread { updateTextBox() }
+    }
+
+    override fun onNewPhysicalPosition() {
+        activity.runOnUiThread { updateTextBox() }
+    }
+
+    override fun onConnect() {
+        activity.runOnUiThread {
+            binding.connectFab.hide()
+        }
+    }
+
+    override fun onDisconnect() {
+        activity.runOnUiThread {
+            binding.connectFab.show()
+            Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
+        }
+    }
+    //endregion
+
+    /**
+     * Attempts to connect to the physical board.
+     */
+    private fun attemptConnect() {
+        try {
+            liBoard.connect()
+        } catch (e: Connection.MissingDriverException) {
+            Log.d("attemptConnect", e::class.simpleName!!)
+            Toast.makeText(activity, "No Board connected", Toast.LENGTH_SHORT).show()
+        } catch (e: Connection.UsbPermissionException) {
+            Log.d("attemptConnect", e::class.simpleName!!)
+        }
+    }
+
+    /**
+     * Exports a game by sending it as an [Intent].
+     */
+    private fun saveGame(uri: Uri) {
+        try {
+            activity.contentResolver.openFileDescriptor(uri, "w")?.use { pfd: ParcelFileDescriptor ->
+                FileOutputStream(pfd.fileDescriptor).use { fos: FileOutputStream ->
+                    fos.write(gameString().toByteArray())
+                }
+            }
+        } catch (e: Exception) {
+            Log.w("exportGame", e)
+            Toast.makeText(activity, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateTextBox() {
+        val tl = binding.tabLayout
+        binding.textbox.text = when (tl.getTabAt(tl.selectedTabPosition)?.tag) {
+            Tab.BOARD -> liBoard.board.toString()
+            Tab.DIAGNOSTICS -> liBoard.physicalPosition.toString()
+            Tab.MOVES -> gameString()
+            else -> ""
+        }
+    }
+
+    private fun gameString() = Game().apply { halfMoves = liBoard.getMoves() }.toPgn(true, true)
+
 
     private enum class Tab(val title: String) {
         BOARD("Board"),
