@@ -15,27 +15,22 @@ import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 import de.pleclercq.liboard.fragments.BoardFragment
 import de.pleclercq.liboard.fragments.CreditsFragment
+import de.pleclercq.liboard.fragments.TabbedFragment
 
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
-    private val boardFragment = BoardFragment(this)
+    private val tabbedFragment = TabbedFragment(this)
     private val creditsFragment = CreditsFragment(this)
     private lateinit var binding: ActivityMainBinding
-    private val usbPermissionReceiver = UsbPermissionReceiver { boardFragment.attemptConnect() }
+
 
     //region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, boardFragment).commit()
-        registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
-    }
-
-    override fun onDestroy() {
-        unregisterReceiver(usbPermissionReceiver)
-        super.onDestroy()
+        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, tabbedFragment).commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

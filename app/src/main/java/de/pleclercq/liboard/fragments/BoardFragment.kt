@@ -1,6 +1,7 @@
 package de.pleclercq.liboard.fragments
 
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment
 import de.pleclercq.liboard.CreatePgnDocument
 import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.R
+import de.pleclercq.liboard.UsbPermissionReceiver
 import de.pleclercq.liboard.databinding.FragmentGameBinding
 import de.pleclercq.liboard.liboard.Connection
 import de.pleclercq.liboard.liboard.LiBoard
@@ -23,11 +25,13 @@ internal class BoardFragment(private val activity: MainActivity) : Fragment(),
     private val liBoard = LiBoard(activity, this)
     private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
     private lateinit var binding: FragmentGameBinding
+    private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
 
     //region Lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        activity.registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -40,6 +44,7 @@ internal class BoardFragment(private val activity: MainActivity) : Fragment(),
 
     override fun onDestroy() {
         liBoard.disconnect()
+        activity.unregisterReceiver(usbPermissionReceiver)
         super.onDestroy()
     }
 
