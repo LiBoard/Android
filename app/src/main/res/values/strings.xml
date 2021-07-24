@@ -7,17 +7,16 @@
     <string name="export_game">Export game</string>
     <!--TODO improve formatting-->
     <string name="credits_html">
-        <h2>Credits</h2>
-        <br />
-        <a href="https://github.com/bhlangonijr/chesslib">chesslib</a>
-        <br />
-        <a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a>
-        <br />
-        <a href="https://www.flaticon.com/authors/good-ware">Good Ware</a>
-        for the
-        <a href="https://github.com/PhilLecl/LiBoard/blob/main/Android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png">
-            icon
-        </a>
+        <![CDATA[
+            <center><h1>Credits</h1></center></br>
+            <h2>
+                <ul>
+                    <li><a href="https://github.com/bhlangonijr/chesslib">chesslib</a></li>
+                    <li><a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a></li>
+                    <li><a href="https://www.flaticon.com/authors/good-ware">Good Ware</a> for the icon</a></li>
+                </ul>
+            </h2>
+        ]]>
     </string>
     <string name="back">Back</string>
 </resources>
