@@ -34,6 +34,7 @@ class LiBoard(private val activity: Activity, private var eventHandler: LiBoardE
     private val liftedPieces = HashSet<Int>()
     private var knownPosition = PhysicalPosition.STARTING_POSITION
     private var connection: Connection? = null
+    internal var clockMove = false
 
     init {
         newGame()
@@ -101,7 +102,7 @@ class LiBoard(private val activity: Activity, private var eventHandler: LiBoardE
             eventHandler.onGameStart()
         } else {
             liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
-            generateMove()
+            if (!clockMove) generateMove()
         }
     }
 
@@ -168,4 +169,6 @@ class LiBoard(private val activity: Activity, private var eventHandler: LiBoardE
         }
     }
     //endregion
+
+    fun tryClockSwitch() = if (!clockMove) true else generateMove()
 }
