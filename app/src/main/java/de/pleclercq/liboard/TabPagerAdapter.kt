@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.databinding.ItemTextBinding
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
+import de.pleclercq.liboard.liboard.toPgn
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -39,7 +40,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<Recyc
     fun updateData() {
         data = arrayOf(
             liBoard.board.toString(),
-            Game().apply { halfMoves = liBoard.getMoves() }.toPgn(true, true),
+            Game(liBoard.getMoves()).toPgn(),
             liBoard.physicalPosition.toString()
         )
     }

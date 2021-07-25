@@ -12,10 +12,8 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import de.pleclercq.liboard.*
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
+import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.liboard.Connection
-import de.pleclercq.liboard.liboard.Game
-import de.pleclercq.liboard.liboard.LiBoard
-import de.pleclercq.liboard.liboard.LiBoardEventHandler
 import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
@@ -78,15 +76,15 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
     //region LiBoard
     override fun onGameStart() {
-        activity.runOnUiThread { updateTextBox() }
+        activity.runOnUiThread { update() }
     }
 
     override fun onMove() {
-        activity.runOnUiThread { updateTextBox() }
+        activity.runOnUiThread { update() }
     }
 
     override fun onNewPhysicalPosition() {
-        activity.runOnUiThread { updateTextBox() }
+        activity.runOnUiThread { update() }
     }
 
     override fun onConnect() {
@@ -133,10 +131,10 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
         }
     }
 
-    private fun updateTextBox() {
+    private fun update() {
         adapter.updateData()
         adapter.notifyDataSetChanged()
     }
 
-    private fun gameString() = Game().apply { halfMoves = liBoard.getMoves() }.toPgn(true, true)
+    private fun gameString() = Game(liBoard.getMoves()).toPgn()
 }

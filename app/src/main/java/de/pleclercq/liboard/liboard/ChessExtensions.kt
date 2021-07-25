@@ -13,6 +13,7 @@ import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.game.*
 import com.github.bhlangonijr.chesslib.move.Move
+import com.github.bhlangonijr.chesslib.move.MoveList
 import java.lang.StringBuilder
 import kotlin.math.abs
 
@@ -73,4 +74,8 @@ fun Game(): Game {
         moveText = StringBuilder()
     }
 }
+
+fun Game(moveList: MoveList) = Game().apply { halfMoves = moveList }
+
+fun Game.toPgn(): String = this.toPgn(true, true)
 //endregion
