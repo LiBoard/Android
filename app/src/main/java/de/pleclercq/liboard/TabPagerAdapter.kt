@@ -8,6 +8,7 @@ import de.pleclercq.liboard.databinding.ItemTextBinding
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
+import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

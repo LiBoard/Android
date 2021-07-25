@@ -1,4 +1,4 @@
-package de.pleclercq.liboard
+package de.pleclercq.liboard.util
 
 import android.view.View
 import android.widget.TextView

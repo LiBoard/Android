@@ -14,6 +14,8 @@ import de.pleclercq.liboard.*
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.liboard.Connection
+import de.pleclercq.liboard.util.CreatePgnDocument
+import de.pleclercq.liboard.util.UsbPermissionReceiver
 import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
