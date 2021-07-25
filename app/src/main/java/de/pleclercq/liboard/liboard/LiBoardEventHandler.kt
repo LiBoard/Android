@@ -3,7 +3,7 @@ package de.pleclercq.liboard.liboard
 /**
  * Handler for game starts, moves and connection related events.
  */
-internal interface LiBoardEventHandler {
+interface LiBoardEventHandler {
     /**
      * Called when a new game starts.
      */

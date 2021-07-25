@@ -9,11 +9,8 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.google.android.material.tabs.TabLayout
-import de.pleclercq.liboard.CreatePgnDocument
-import de.pleclercq.liboard.MainActivity
-import de.pleclercq.liboard.R
-import de.pleclercq.liboard.UsbPermissionReceiver
+import com.google.android.material.tabs.TabLayoutMediator
+import de.pleclercq.liboard.*
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.Connection
 import de.pleclercq.liboard.liboard.Game
@@ -22,12 +19,12 @@ import de.pleclercq.liboard.liboard.LiBoardEventHandler
 import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
-class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout.OnTabSelectedListener,
-    LiBoardEventHandler {
+class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEventHandler {
     private lateinit var binding: FragmentTabbedBinding
     private val liBoard = LiBoard(activity, this)
     private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
     private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
+    private lateinit var adapter: TabPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,12 +39,17 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout
         binding.connectFab.setOnClickListener { attemptConnect() }
 
         val tl = binding.tabLayout
-        tl.addOnTabSelectedListener(this)
-        for (tab in Tab.values())
-            tl.addTab(tl.newTab().apply {
-                text = tab.title
-                tag = tab
-            })
+        val vp = binding.viewPager
+        adapter = TabPagerAdapter(liBoard)
+        vp.adapter = adapter
+        TabLayoutMediator(tl, vp) { tab, i ->
+            tab.text = when (i) {
+                0 -> "Board"
+                1 -> "Moves"
+                2 -> "Diagnostics"
+                else -> "Not found"
+            }
+        }.attach()
 
         return binding.root
     }
@@ -71,18 +73,6 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout
             else -> return false
         }
         return true
-    }
-    //endregion
-
-    //region OnTabSelectedListener
-    override fun onTabSelected(tab: TabLayout.Tab) = updateTextBox()
-
-    override fun onTabUnselected(tab: TabLayout.Tab) {
-        Log.d("Tab unselected", "${tab.tag}")
-    }
-
-    override fun onTabReselected(tab: TabLayout.Tab) {
-        Log.d("Tab reselected", "${tab.tag}")
     }
     //endregion
 
@@ -144,21 +134,9 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), TabLayout
     }
 
     private fun updateTextBox() {
-        val tl = binding.tabLayout
-        binding.textbox.text = when (tl.getTabAt(tl.selectedTabPosition)?.tag) {
-            Tab.BOARD -> liBoard.board.toString()
-            Tab.DIAGNOSTICS -> liBoard.physicalPosition.toString()
-            Tab.MOVES -> gameString()
-            else -> ""
-        }
+        adapter.updateData()
+        adapter.notifyDataSetChanged()
     }
 
     private fun gameString() = Game().apply { halfMoves = liBoard.getMoves() }.toPgn(true, true)
-
-
-    private enum class Tab(val title: String) {
-        BOARD("Board"),
-        MOVES("Moves"),
-        DIAGNOSTICS("Diagnostics")
-    }
 }

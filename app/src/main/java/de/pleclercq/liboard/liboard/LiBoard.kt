@@ -9,10 +9,8 @@ package de.pleclercq.liboard.liboard
 
 import android.app.Activity
 import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.game.Game
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
-import java.util.*
 
 /**
  * A class handling everything related to the board.
@@ -26,7 +24,7 @@ import java.util.*
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
-internal class LiBoard(private val activity: Activity, private var eventHandler: LiBoardEventHandler) {
+class LiBoard(private val activity: Activity, private var eventHandler: LiBoardEventHandler) {
     val isConnected get() = connection != null
     lateinit var board: Board
         private set
