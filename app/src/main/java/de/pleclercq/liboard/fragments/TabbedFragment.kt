@@ -138,5 +138,5 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
         adapter.notifyDataSetChanged()
     }
 
-    private fun gameString() = Game(liBoard.getMoves()).toPgn()
+    private fun gameString() = Game(liBoard).toPgn()
 }

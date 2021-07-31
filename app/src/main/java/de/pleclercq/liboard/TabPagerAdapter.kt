@@ -41,7 +41,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<Recyc
     fun updateData() {
         data = arrayOf(
             liBoard.board.toString(),
-            Game(liBoard.getMoves()).toPgn(),
+            Game(liBoard).toPgn(),
             liBoard.physicalPosition.toString()
         )
     }

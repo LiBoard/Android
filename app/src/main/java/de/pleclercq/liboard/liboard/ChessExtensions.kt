@@ -7,14 +7,9 @@
 
 package de.pleclercq.liboard.liboard
 
-import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.PieceType
-import com.github.bhlangonijr.chesslib.Square
+import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.game.*
 import com.github.bhlangonijr.chesslib.move.Move
-import com.github.bhlangonijr.chesslib.move.MoveList
-import java.lang.StringBuilder
 import kotlin.math.abs
 
 //region Board
@@ -75,7 +70,18 @@ fun Game(): Game {
     }
 }
 
-fun Game(moveList: MoveList) = Game().apply { halfMoves = moveList }
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Game(liBoard: LiBoard) = Game().apply {
+    halfMoves = liBoard.getMoves()
+    board = liBoard.board
+    result = if (board.isDraw) {
+        GameResult.DRAW
+    } else if (board.isMated) {
+        if (board.sideToMove == Side.WHITE) GameResult.BLACK_WON else GameResult.WHITE_WON
+    } else {
+        GameResult.ONGOING
+    }
+}
 
 fun Game.toPgn(): String = this.toPgn(true, true)
 //endregion
