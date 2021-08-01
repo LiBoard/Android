@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.chessclock
 
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+class DelayClock(timeControl: TimeControl) : ChessClock(timeControl) {
+    override fun getCurrentTime(_side: Int) =
+        maxOf(times[_side] - (timeControl.increments[_side] * RESOLUTION), super.getCurrentTime(_side))
 
-abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    abstract fun updateContents(data: String)
+    override fun applyIncrement(_side: Int) {}
 }

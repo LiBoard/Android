@@ -18,49 +18,52 @@
 
 package de.pleclercq.liboard
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import de.pleclercq.liboard.databinding.ItemTextBinding
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
+import de.pleclercq.liboard.util.TextViewHolder
 import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
-class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private lateinit var data: Array<String>
+class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
+    private lateinit var data: Array<Pair<String, Int>>
 
     init {
         updateData()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemTextBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding.root)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return when (viewType) {
+            TEXT_BIG -> TextViewHolder(parent.context)
+            TEXT_SMALL -> TextViewHolder(parent.context, 12F, TextView.TEXT_ALIGNMENT_TEXT_START)
+            CLOCK -> TextViewHolder(parent.context)
+            else -> throw NotImplementedError()
+        }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val tb = (holder as ViewHolder).textbox
-        tb.text = data[position]
-        if (position == 1) {
-            tb.textSize = 12F
-            tb.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
-        } else {
-            tb.textSize = 30F
-            tb.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-        }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.updateContents(data[position].first)
     }
 
     override fun getItemCount() = data.size
 
+    override fun getItemViewType(position: Int) = data[position].second
+
     fun updateData() {
         data = arrayOf(
-            liBoard.board.toString(),
-            Game(liBoard).toPgn(),
-            liBoard.physicalPosition.toString()
+            Pair(liBoard.board.toString(), TEXT_BIG),
+            Pair(Game(liBoard).toPgn(), TEXT_SMALL),
+            Pair(liBoard.physicalPosition.toString(), TEXT_BIG),
+            Pair("TODO", CLOCK) // TODO add actual value
         )
+    }
+
+    companion object {
+        const val TEXT_BIG = 0
+        const val TEXT_SMALL = 1
+        const val CLOCK = 2
     }
 }
