@@ -11,7 +11,7 @@
 		app:layout_constraintBottom_toTopOf="@id/clock_stop"
 		app:layout_constraintTop_toTopOf="parent"
 		android:text="@string/ready"
-		android:textSize="30sp"
+		android:textSize="50sp"
 		android:gravity="center"
 		android:rotation="180" />
 
@@ -36,8 +36,7 @@
 		app:layout_constraintTop_toBottomOf="@id/clock_stop"
 		android:textAlignment="center"
 		android:text="@string/ready"
-		android:textSize="30sp"
-		android:gravity="center"
-		android:rotation="180" />
+		android:textSize="50sp"
+		android:gravity="center"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
