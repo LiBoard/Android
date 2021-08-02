@@ -21,71 +21,71 @@ package de.pleclercq.liboard.chessclock
 import androidx.annotation.Size
 
 open class ChessClock(protected val timeControl: TimeControl) {
-    @Size(2)
-    protected var times = initialTimes
-    var side = WHITE
-        set(value) {
-            if (value != field) {
-                if (running) {
-                    storeTimes()
-                    timeSideStarted = sysTime
-                }
-                field = value
-            }
-        }
-    var running = false
-        set(value) {
-            if (value != field) {
-                if (value)
-                    timeSideStarted = sysTime
-                else
-                    storeTimes()
-                field = value
-            }
-        }
-    private var timeSideStarted = sysTime
-    private val sysTime get() = System.currentTimeMillis()
-    private val initialTimes get() = IntArray(2) { i -> timeControl.initialTimes[i] * RESOLUTION }
-    val flagged: Int?
-        get() {
-            val r = intArrayOf(
-                WHITE,
-                BLACK
-            ).firstOrNull { getCurrentTime(it) < 0 } // the '<' is essential for Stopwatch mode
-            if (r != null)
-                running = false
-            return r
-        }
-    protected val timeDelta get() = (sysTime - timeSideStarted).toInt()
+	@Size(2)
+	protected var times = initialTimes
+	var side = WHITE
+		set(value) {
+			if (value != field) {
+				if (running) {
+					storeTimes()
+					timeSideStarted = sysTime
+				}
+				field = value
+			}
+		}
+	var running = false
+		set(value) {
+			if (value != field) {
+				if (value)
+					timeSideStarted = sysTime
+				else
+					storeTimes()
+				field = value
+			}
+		}
+	private var timeSideStarted = sysTime
+	private val sysTime get() = System.currentTimeMillis()
+	private val initialTimes get() = IntArray(2) { i -> timeControl.initialTimes[i] * RESOLUTION }
+	val flagged: Int?
+		get() {
+			val r = intArrayOf(
+				WHITE,
+				BLACK
+			).firstOrNull { getCurrentTime(it) < 0 } // the '<' is essential for Stopwatch mode
+			if (r != null)
+				running = false
+			return r
+		}
+	protected val timeDelta get() = (sysTime - timeSideStarted).toInt()
 
-    private fun onMove() {
-        applyIncrement(side)
-        side = if (side == WHITE) BLACK else WHITE
-    }
+	private fun onMove() {
+		applyIncrement(side)
+		side = if (side == WHITE) BLACK else WHITE
+	}
 
-    private fun reset() {
-        running = false
-        times = initialTimes
-    }
+	private fun reset() {
+		running = false
+		times = initialTimes
+	}
 
-    protected open fun applyIncrement(_side: Int) {
-        times[_side] += timeControl.increments[_side] * RESOLUTION
-    }
+	protected open fun applyIncrement(_side: Int) {
+		times[_side] += timeControl.increments[_side] * RESOLUTION
+	}
 
-    open fun getCurrentTime(_side: Int) = times[_side] - (if (running && _side == side) timeDelta else 0)
-    private fun storeTimes() {
-        times = intArrayOf(getCurrentTime(WHITE), getCurrentTime(BLACK))
-    }
+	open fun getCurrentTime(_side: Int) = times[_side] - (if (running && _side == side) timeDelta else 0)
+	private fun storeTimes() {
+		times = intArrayOf(getCurrentTime(WHITE), getCurrentTime(BLACK))
+	}
 
-    override fun toString() =
-        "%.2f|%.2f".format(
-            getCurrentTime(WHITE).toDouble() / RESOLUTION,
-            getCurrentTime(BLACK).toDouble() / RESOLUTION
-        )
+	override fun toString() =
+		"%.2f|%.2f".format(
+			getCurrentTime(WHITE).toDouble() / RESOLUTION,
+			getCurrentTime(BLACK).toDouble() / RESOLUTION
+		)
 
-    companion object {
-        const val WHITE = 0
-        const val BLACK = 1
-        const val RESOLUTION = 1000 // Hz -> 1000Hz = millisecond accuracy
-    }
+	companion object {
+		const val WHITE = 0
+		const val BLACK = 1
+		const val RESOLUTION = 1000 // Hz -> 1000Hz = millisecond accuracy
+	}
 }

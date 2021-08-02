@@ -21,32 +21,32 @@ package de.pleclercq.liboard.chessclock
 import androidx.annotation.Size
 
 data class TimeControl(@Size(2) val initialTimes: IntArray, @Size(2) val increments: IntArray) {
-    val hasTimeOdds get() = initialTimes.toSet().size > 1 || increments.toSet().size > 1
+	val hasTimeOdds get() = initialTimes.toSet().size > 1 || increments.toSet().size > 1
 
-    constructor(initialTime: Int, increment: Int) : this(
-        intArrayOf(initialTime, initialTime),
-        intArrayOf(increment, increment)
-    )
+	constructor(initialTime: Int, increment: Int) : this(
+		intArrayOf(initialTime, initialTime),
+		intArrayOf(increment, increment)
+	)
 
-    init {
-        if (initialTimes.size != 2 || increments.size != 2) throw IndexOutOfBoundsException()
-    }
+	init {
+		if (initialTimes.size != 2 || increments.size != 2) throw IndexOutOfBoundsException()
+	}
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+	override fun equals(other: Any?): Boolean {
+		if (this === other) return true
+		if (javaClass != other?.javaClass) return false
 
-        other as TimeControl
+		other as TimeControl
 
-        if (!initialTimes.contentEquals(other.initialTimes)) return false
-        if (!increments.contentEquals(other.increments)) return false
+		if (!initialTimes.contentEquals(other.initialTimes)) return false
+		if (!increments.contentEquals(other.increments)) return false
 
-        return true
-    }
+		return true
+	}
 
-    override fun hashCode(): Int {
-        var result = initialTimes.contentHashCode()
-        result = 31 * result + increments.contentHashCode()
-        return result
-    }
+	override fun hashCode(): Int {
+		var result = initialTimes.contentHashCode()
+		result = 31 * result + increments.contentHashCode()
+		return result
+	}
 }

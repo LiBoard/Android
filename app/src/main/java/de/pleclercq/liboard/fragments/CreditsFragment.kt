@@ -30,16 +30,16 @@ import de.pleclercq.liboard.databinding.FragmentCreditsBinding
 
 @ExperimentalUnsignedTypes
 class CreditsFragment(private val activity: MainActivity) : Fragment() {
-    private lateinit var binding: FragmentCreditsBinding
+	private lateinit var binding: FragmentCreditsBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentCreditsBinding.inflate(inflater, container, false)
-        binding.closeCredits.setOnClickListener { activity.supportFragmentManager.popBackStack() }
-        binding.creditsTextView.loadData(
-            Base64.encodeToString(getString(R.string.credits_html).toByteArray(), Base64.NO_PADDING),
-            "text/html",
-            "base64"
-        )
-        return binding.root
-    }
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+		binding = FragmentCreditsBinding.inflate(inflater, container, false)
+		binding.closeCredits.setOnClickListener { activity.supportFragmentManager.popBackStack() }
+		binding.creditsTextView.loadData(
+			Base64.encodeToString(getString(R.string.credits_html).toByteArray(), Base64.NO_PADDING),
+			"text/html",
+			"base64"
+		)
+		return binding.root
+	}
 }

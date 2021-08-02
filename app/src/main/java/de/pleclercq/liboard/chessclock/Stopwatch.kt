@@ -19,5 +19,5 @@
 package de.pleclercq.liboard.chessclock
 
 class Stopwatch : ChessClock(TimeControl(0, 0)) {
-    override fun getCurrentTime(_side: Int) = times[_side] + (if (running && _side == side) timeDelta else 0)
+	override fun getCurrentTime(_side: Int) = times[_side] + (if (running && _side == side) timeDelta else 0)
 }

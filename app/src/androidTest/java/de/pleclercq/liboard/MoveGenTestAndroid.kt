@@ -29,9 +29,9 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class MoveGenTestAndroid {
-    @Test
-    fun moveGenLegalNormal() = assertNotNull(Board().findMove(Square.E2, Square.E4))
+	@Test
+	fun moveGenLegalNormal() = assertNotNull(Board().findMove(Square.E2, Square.E4))
 
-    @Test
-    fun moveGenIllegalNormal() = assertNull(Board().findMove(Square.A1, Square.E4))
+	@Test
+	fun moveGenIllegalNormal() = assertNull(Board().findMove(Square.A1, Square.E4))
 }

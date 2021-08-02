@@ -18,13 +18,20 @@
 
 package de.pleclercq.liboard.util
 
+import android.view.View
 import de.pleclercq.liboard.databinding.ChessclockBinding
 
-class ClockHolder(private val binding: ChessclockBinding) : ViewHolder(binding.root) {
-    override fun updateContents(data: String) {
-        val times = data.split('|')
-        binding.clockWhite.text = times[0]
-        binding.clockBlack.text = times[1]
-    }
+class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Unit) : ViewHolder(binding.root) {
+	init {
+		binding.clockBlack.setOnClickListener(onClick)
+		binding.clockWhite.setOnClickListener(onClick)
+		binding.clockStop.setOnClickListener(onClick)
+	}
+
+	override fun updateContents(data: String) {
+		val times = data.split('|')
+		binding.clockWhite.text = times[0]
+		binding.clockBlack.text = times[1]
+	}
 
 }

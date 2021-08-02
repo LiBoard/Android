@@ -29,34 +29,34 @@ import de.pleclercq.liboard.fragments.TabbedFragment
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
-    private val tabbedFragment = TabbedFragment(this)
-    private val creditsFragment = CreditsFragment(this)
-    private lateinit var binding: ActivityMainBinding
+	private val tabbedFragment = TabbedFragment(this)
+	private val creditsFragment = CreditsFragment(this)
+	private lateinit var binding: ActivityMainBinding
 
 
-    //region Activity lifecycle
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, tabbedFragment).commit()
-    }
+	//region Activity lifecycle
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		binding = ActivityMainBinding.inflate(layoutInflater)
+		setContentView(binding.root)
+		supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, tabbedFragment).commit()
+	}
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activity_main, menu)
-        return true
-    }
-    //endregion
+	override fun onCreateOptionsMenu(menu: Menu): Boolean {
+		menuInflater.inflate(R.menu.activity_main, menu)
+		return true
+	}
+	//endregion
 
-    //region UI events
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.credits -> supportFragmentManager.beginTransaction()
-                .replace(R.id.main_fragment_container_view, creditsFragment).addToBackStack("credits").commit()
+	//region UI events
+	override fun onOptionsItemSelected(item: MenuItem): Boolean {
+		when (item.itemId) {
+			R.id.credits -> supportFragmentManager.beginTransaction()
+				.replace(R.id.main_fragment_container_view, creditsFragment).addToBackStack("credits").commit()
 
-            else -> return false
-        }
-        return true
-    }
-    //endregion
+			else -> return false
+		}
+		return true
+	}
+	//endregion
 }

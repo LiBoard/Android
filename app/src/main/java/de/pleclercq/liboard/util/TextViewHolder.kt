@@ -24,20 +24,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 class TextViewHolder(context: Context, textSize: Float = 30F, textAlignment: Int = TextView.TEXT_ALIGNMENT_CENTER) :
-    ViewHolder(TextView(context).apply {
-        this.textSize = textSize
-        this.textAlignment = textAlignment
-        this.layoutParams = LAYOUT_PARAMS
-        this.typeface = Typeface.MONOSPACE
-    }) {
-    private val view = itemView as TextView
+	ViewHolder(TextView(context).apply {
+		this.textSize = textSize
+		this.textAlignment = textAlignment
+		this.layoutParams = LAYOUT_PARAMS
+		this.typeface = Typeface.MONOSPACE
+	}) {
+	private val view = itemView as TextView
 
-    override fun updateContents(data: String) {
-        view.text = data
-    }
+	override fun updateContents(data: String) {
+		view.text = data
+	}
 
-    companion object {
-        val LAYOUT_PARAMS =
-            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-    }
+	companion object {
+		val LAYOUT_PARAMS =
+			ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+	}
 }

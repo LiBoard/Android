@@ -40,7 +40,7 @@ fun Board.isNormalCapture(move: Move) = getPiece(move.to) != Piece.NONE
  * This checks for a king moving two squares along one rank. 960 castling is not (currently) supported.
  */
 fun Board.isCastling(move: Move) =
-    getPiece(move.from).pieceType == PieceType.KING && abs(move.from.ordinal - move.to.ordinal) == 2
+	getPiece(move.from).pieceType == PieceType.KING && abs(move.from.ordinal - move.to.ordinal) == 2
 
 /**
  * Checks if a move is en passant.
@@ -67,31 +67,31 @@ fun Board.findMove(from: Int, to: Int) = findMove(Square.squareAt(from), Square.
  * Creates a [Game] no information.
  */
 fun Game(): Game {
-    return Game("",
-        Round(Event().apply {
-            name = ""
-            site = ""
-            startDate = ""
-        }).apply { number = 1 }).apply {
-        whitePlayer = GenericPlayer("", "")
-        blackPlayer = GenericPlayer("", "")
-        result = GameResult.ONGOING
-        plyCount = ""
-        moveText = StringBuilder()
-    }
+	return Game("",
+		Round(Event().apply {
+			name = ""
+			site = ""
+			startDate = ""
+		}).apply { number = 1 }).apply {
+		whitePlayer = GenericPlayer("", "")
+		blackPlayer = GenericPlayer("", "")
+		result = GameResult.ONGOING
+		plyCount = ""
+		moveText = StringBuilder()
+	}
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun Game(liBoard: LiBoard) = Game().apply {
-    halfMoves = liBoard.getMoves()
-    board = liBoard.board
-    result = if (board.isDraw) {
-        GameResult.DRAW
-    } else if (board.isMated) {
-        if (board.sideToMove == Side.WHITE) GameResult.BLACK_WON else GameResult.WHITE_WON
-    } else {
-        GameResult.ONGOING
-    }
+	halfMoves = liBoard.getMoves()
+	board = liBoard.board
+	result = if (board.isDraw) {
+		GameResult.DRAW
+	} else if (board.isMated) {
+		if (board.sideToMove == Side.WHITE) GameResult.BLACK_WON else GameResult.WHITE_WON
+	} else {
+		GameResult.ONGOING
+	}
 }
 
 fun Game.toPgn(): String = this.toPgn(true, true)

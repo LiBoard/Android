@@ -36,150 +36,150 @@ import com.github.bhlangonijr.chesslib.move.MoveList
  */
 @ExperimentalUnsignedTypes
 class LiBoard(private val activity: Activity, private var eventHandler: LiBoardEventHandler) {
-    val isConnected get() = connection != null
-    lateinit var board: Board
-        private set
-    internal var physicalPosition = PhysicalPosition.STARTING_POSITION
-        private set
-    private val moveList = MoveList()
-    private val liftedPieces = HashSet<Int>()
-    private var knownPosition = PhysicalPosition.STARTING_POSITION
-    private var connection: Connection? = null
-    internal var clockMove = false
+	val isConnected get() = connection != null
+	lateinit var board: Board
+		private set
+	internal var physicalPosition = PhysicalPosition.STARTING_POSITION
+		private set
+	private val moveList = MoveList()
+	private val liftedPieces = HashSet<Int>()
+	private var knownPosition = PhysicalPosition.STARTING_POSITION
+	private var connection: Connection? = null
+	internal var clockMove = false
 
-    init {
-        newGame()
-    }
+	init {
+		newGame()
+	}
 
-    //region Position
-    /**
-     * Tries to find a move that matches the difference between [knownPosition] and [physicalPosition].
-     * Makes the move if one was found.
-     *
-     * @return whether a move was found
-     */
-    private fun generateMove(): Boolean {
-        val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
-        val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
-        val temporarilyLiftedPieces = liftedPieces.intersect(physicalPosition.occupiedSquares)
+	//region Position
+	/**
+	 * Tries to find a move that matches the difference between [knownPosition] and [physicalPosition].
+	 * Makes the move if one was found.
+	 *
+	 * @return whether a move was found
+	 */
+	private fun generateMove(): Boolean {
+		val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
+		val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
+		val temporarilyLiftedPieces = liftedPieces.intersect(physicalPosition.occupiedSquares)
 
-        if (disappearances.size == 1 && appearances.size == 1) {
-            // normal move
-            val m = board.findMove(disappearances.first(), appearances.first())
-            return m != null && !board.isCastling(m) && !board.isCapture(m) && tryMove(m)
-        } else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
-            // "normal" capture (not e.p.)
-            for (to in temporarilyLiftedPieces) {
-                val m = board.findMove(disappearances.first(), to)
-                if (m != null && board.isNormalCapture(m) && tryMove(m))
-                    return true
-            }
-            return false
-        } else if (disappearances.size == 2 && appearances.size == 1) {
-            // en passant
-            for (from in disappearances) {
-                for (to in appearances) {
-                    val m = board.findMove(from, to)
-                    if (m != null && board.isEnPassant(m) && tryMove(m))
-                        return true
-                }
-            }
-            return false
-        } else if (disappearances.size == 2 && appearances.size == 2) {
-            // castling
-            for (from in disappearances) {
-                for (to in appearances) {
-                    val m = board.findMove(from, to)
-                    if (m != null && board.isCastling(m) && tryMove(m))
-                        return true
-                }
-            }
-            return false
-        }
-        return false
-    }
+		if (disappearances.size == 1 && appearances.size == 1) {
+			// normal move
+			val m = board.findMove(disappearances.first(), appearances.first())
+			return m != null && !board.isCastling(m) && !board.isCapture(m) && tryMove(m)
+		} else if (disappearances.size == 1 && appearances.isEmpty() && temporarilyLiftedPieces.isNotEmpty()) {
+			// "normal" capture (not e.p.)
+			for (to in temporarilyLiftedPieces) {
+				val m = board.findMove(disappearances.first(), to)
+				if (m != null && board.isNormalCapture(m) && tryMove(m))
+					return true
+			}
+			return false
+		} else if (disappearances.size == 2 && appearances.size == 1) {
+			// en passant
+			for (from in disappearances) {
+				for (to in appearances) {
+					val m = board.findMove(from, to)
+					if (m != null && board.isEnPassant(m) && tryMove(m))
+						return true
+				}
+			}
+			return false
+		} else if (disappearances.size == 2 && appearances.size == 2) {
+			// castling
+			for (from in disappearances) {
+				for (to in appearances) {
+					val m = board.findMove(from, to)
+					if (m != null && board.isCastling(m) && tryMove(m))
+						return true
+				}
+			}
+			return false
+		}
+		return false
+	}
 
-    /**
-     * Gets called when a new physical board position comes in.
-     * Resets the board to the starting position if necessary
-     * or tries to find a legal move matching the position otherwise.
-     */
-    internal fun onNewPhysicalPosition(position: PhysicalPosition) {
-        eventHandler.onNewPhysicalPosition()
-        physicalPosition = position
-        if (position == PhysicalPosition.STARTING_POSITION) {
-            newGame()
-            updateKnownPosition()
-            eventHandler.onGameStart()
-        } else {
-            liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
-            if (!clockMove) generateMove()
-        }
-    }
+	/**
+	 * Gets called when a new physical board position comes in.
+	 * Resets the board to the starting position if necessary
+	 * or tries to find a legal move matching the position otherwise.
+	 */
+	internal fun onNewPhysicalPosition(position: PhysicalPosition) {
+		eventHandler.onNewPhysicalPosition()
+		physicalPosition = position
+		if (position == PhysicalPosition.STARTING_POSITION) {
+			newGame()
+			updateKnownPosition()
+			eventHandler.onGameStart()
+		} else {
+			liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
+			if (!clockMove) generateMove()
+		}
+	}
 
-    /**
-     * Tries a move.
-     * Calls [onMove] and returns true if successful.
-     */
-    private fun tryMove(move: Move): Boolean {
-        if (board.doMove(move)) {
-            onMove(move)
-            return true
-        }
-        return false
-    }
+	/**
+	 * Tries a move.
+	 * Calls [onMove] and returns true if successful.
+	 */
+	private fun tryMove(move: Move): Boolean {
+		if (board.doMove(move)) {
+			onMove(move)
+			return true
+		}
+		return false
+	}
 
-    /**
-     * Called when a new [Move] is detected.
-     * Updates the [knownPosition], adds the [move] to the [moveList]
-     * and calls [eventHandler]'s [LiBoardEventHandler.onMove].
-     */
-    private fun onMove(move: Move) {
-        updateKnownPosition()
-        moveList.addLast(move)
-        eventHandler.onMove()
-    }
+	/**
+	 * Called when a new [Move] is detected.
+	 * Updates the [knownPosition], adds the [move] to the [moveList]
+	 * and calls [eventHandler]'s [LiBoardEventHandler.onMove].
+	 */
+	private fun onMove(move: Move) {
+		updateKnownPosition()
+		moveList.addLast(move)
+		eventHandler.onMove()
+	}
 
-    /**
-     * Creates a new [Board] and clears the [moveList].
-     */
-    private fun newGame() {
-        board = Board()
-        moveList.clear()
-    }
+	/**
+	 * Creates a new [Board] and clears the [moveList].
+	 */
+	private fun newGame() {
+		board = Board()
+		moveList.clear()
+	}
 
-    /**
-     * Sets [knownPosition] tp [physicalPosition] and clears [liftedPieces].
-     */
-    private fun updateKnownPosition() {
-        knownPosition = physicalPosition
-        liftedPieces.clear()
-    }
+	/**
+	 * Sets [knownPosition] tp [physicalPosition] and clears [liftedPieces].
+	 */
+	private fun updateKnownPosition() {
+		knownPosition = physicalPosition
+		liftedPieces.clear()
+	}
 
-    fun getMoves() = MoveList(moveList)
-    //endregion
+	fun getMoves() = MoveList(moveList)
+	//endregion
 
-    //region Connection
-    /**
-     * Creates a new [Connection].
-     */
-    fun connect() {
-        if (isConnected) disconnect()
-        connection = Connection(activity, this)
-        eventHandler.onConnect()
-    }
+	//region Connection
+	/**
+	 * Creates a new [Connection].
+	 */
+	fun connect() {
+		if (isConnected) disconnect()
+		connection = Connection(activity, this)
+		eventHandler.onConnect()
+	}
 
-    /**
-     * Closes and unregisters the current [Connection].
-     */
-    fun disconnect() {
-        if (connection != null) {
-            connection?.close()
-            connection = null
-            eventHandler.onDisconnect()
-        }
-    }
-    //endregion
+	/**
+	 * Closes and unregisters the current [Connection].
+	 */
+	fun disconnect() {
+		if (connection != null) {
+			connection?.close()
+			connection = null
+			eventHandler.onDisconnect()
+		}
+	}
+	//endregion
 
-    fun tryClockSwitch() = if (!clockMove) true else generateMove()
+	fun tryClockSwitch() = if (!clockMove) true else generateMove()
 }

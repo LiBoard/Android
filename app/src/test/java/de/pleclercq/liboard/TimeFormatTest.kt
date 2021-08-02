@@ -21,11 +21,11 @@ package de.pleclercq.liboard
 import org.junit.Test
 
 class TimeFormatTest {
-    @Test
-    fun formatDoubleTest() {
-        val white = 1.2354
-        val black = 1.0
-        val s = "%.2f|%.2f".format(white, black)
-        assert(s.matches(Regex("""1.24\|1.00""")))
-    }
+	@Test
+	fun formatDoubleTest() {
+		val white = 1.2354
+		val black = 1.0
+		val s = "%.2f|%.2f".format(white, black)
+		assert(s.matches(Regex("""1.24\|1.00""")))
+	}
 }

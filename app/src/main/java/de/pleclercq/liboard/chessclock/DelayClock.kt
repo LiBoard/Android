@@ -19,8 +19,8 @@
 package de.pleclercq.liboard.chessclock
 
 class DelayClock(timeControl: TimeControl) : ChessClock(timeControl) {
-    override fun getCurrentTime(_side: Int) =
-        maxOf(times[_side] - (timeControl.increments[_side] * RESOLUTION), super.getCurrentTime(_side))
+	override fun getCurrentTime(_side: Int) =
+		maxOf(times[_side] - (timeControl.increments[_side] * RESOLUTION), super.getCurrentTime(_side))
 
-    override fun applyIncrement(_side: Int) {}
+	override fun applyIncrement(_side: Int) {}
 }

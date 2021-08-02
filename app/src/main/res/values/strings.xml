@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">LiBoard</string>
-    <string name="disconnect">Disconnect</string>
-    <string name="connect">Connect</string>
-    <string name="ready">Ready</string>
-    <string name="credits">Credits</string>
-    <string name="export_game">Export game</string>
-    <string name="stop">Stop</string>
-    <!--TODO improve formatting-->
-    <string name="credits_html">
+	<string name="app_name">LiBoard</string>
+	<string name="disconnect">Disconnect</string>
+	<string name="connect">Connect</string>
+	<string name="ready">Ready</string>
+	<string name="credits">Credits</string>
+	<string name="export_game">Export game</string>
+	<string name="stop">Stop</string>
+	<!--TODO improve formatting-->
+	<string name="credits_html">
         <![CDATA[
             <center><h1>Credits</h1></center></br>
             <h2>
@@ -19,5 +19,5 @@
             </h2>
         ]]>
     </string>
-    <string name="back">Back</string>
+	<string name="back">Back</string>
 </resources>
