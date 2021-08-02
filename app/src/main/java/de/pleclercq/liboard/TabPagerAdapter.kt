@@ -37,8 +37,8 @@ import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
-	private var data = arrayOf<Pair<String, Int>>()
 	private var clock = ChessClock(TimeControl(180, 2))
+	private var data = getData()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
 
@@ -78,7 +78,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 
 	private fun onTick() {
 		updateData()
-		if (clock.running) handler.postDelayed(runnable, 100)
+		if (clock.running) handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
 	}
 
 	private fun onClick(view: View) {
@@ -97,12 +97,13 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 
 	private fun startClock() {
 		clock.running = true
-		handler.postDelayed(runnable, 100)
+		handler.post(runnable)
 	}
 
 	companion object {
 		const val TEXT_BIG = 0
 		const val TEXT_SMALL = 1
 		const val CLOCK = 2
+		const val CLOCK_REFRESH_RATE = 250L
 	}
 }

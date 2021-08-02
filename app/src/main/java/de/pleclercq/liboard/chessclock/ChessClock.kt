@@ -28,6 +28,7 @@ open class ChessClock(protected val timeControl: TimeControl) {
 			if (value != field) {
 				if (running) {
 					storeTimes()
+					applyIncrement(field)
 					timeSideStarted = sysTime
 				}
 				field = value
@@ -58,11 +59,6 @@ open class ChessClock(protected val timeControl: TimeControl) {
 		}
 	protected val timeDelta get() = (sysTime - timeSideStarted).toInt()
 
-	private fun onMove() {
-		applyIncrement(side)
-		side = if (side == WHITE) BLACK else WHITE
-	}
-
 	private fun reset() {
 		running = false
 		times = initialTimes
@@ -78,7 +74,7 @@ open class ChessClock(protected val timeControl: TimeControl) {
 	}
 
 	override fun toString() =
-		"%.2f|%.2f".format(
+		"%.1f|%.1f".format(
 			getCurrentTime(WHITE).toDouble() / RESOLUTION,
 			getCurrentTime(BLACK).toDouble() / RESOLUTION
 		)
