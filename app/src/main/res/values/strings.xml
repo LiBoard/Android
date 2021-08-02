@@ -6,7 +6,6 @@
 	<string name="credits">Credits</string>
 	<string name="export_game">Export game</string>
 	<string name="stop">Stop</string>
-	<!--TODO improve formatting-->
 	<string name="credits_html">
         <![CDATA[
             <center><h1>Credits</h1></center></br>

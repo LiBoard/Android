@@ -34,7 +34,6 @@ fun Board.isCapture(move: Move) = isNormalCapture(move) || isEnPassant(move)
  */
 fun Board.isNormalCapture(move: Move) = getPiece(move.to) != Piece.NONE
 
-// TODO implement 960 castling
 /**
  * Check if a move is castling.
  * This checks for a king moving two squares along one rank. 960 castling is not (currently) supported.

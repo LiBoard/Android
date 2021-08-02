@@ -73,12 +73,6 @@ open class ChessClock(protected val timeControl: TimeControl) {
 		times = intArrayOf(getCurrentTime(WHITE), getCurrentTime(BLACK))
 	}
 
-	override fun toString() =
-		"%.2f|%.2f".format(
-			getCurrentTime(WHITE).toDouble() / RESOLUTION,
-			getCurrentTime(BLACK).toDouble() / RESOLUTION
-		) // TODO better formatting
-
 	companion object {
 		const val WHITE = 0
 		const val BLACK = 1
