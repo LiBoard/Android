@@ -74,10 +74,10 @@ open class ChessClock(protected val timeControl: TimeControl) {
 	}
 
 	override fun toString() =
-		"%.1f|%.1f".format(
+		"%.2f|%.2f".format(
 			getCurrentTime(WHITE).toDouble() / RESOLUTION,
 			getCurrentTime(BLACK).toDouble() / RESOLUTION
-		)
+		) // TODO better formatting
 
 	companion object {
 		const val WHITE = 0

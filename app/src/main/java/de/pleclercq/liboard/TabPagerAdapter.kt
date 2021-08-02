@@ -38,15 +38,24 @@ import de.pleclercq.liboard.util.ViewHolder
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
 	private var clock = ChessClock(TimeControl(180, 2))
-	private var data = getData()
+	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
 
+	init {
+		setHasStableIds(true)
+	}
+
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
+	override fun getItemCount() = items.size
+	override fun getItemViewType(position: Int) = items[position].type
+	override fun getItemId(position: Int) = items[position].id
+
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return when (viewType) {
-			TEXT_BIG -> TextViewHolder(parent.context)
-			TEXT_SMALL -> TextViewHolder(parent.context, 12F, TextView.TEXT_ALIGNMENT_TEXT_START)
-			CLOCK -> ClockHolder(
+			TYPE_TEXT_BIG -> TextViewHolder(parent.context)
+			TYPE_TEXT_SMALL -> TextViewHolder(parent.context, 12F, TextView.TEXT_ALIGNMENT_TEXT_START)
+			TYPE_CLOCK -> ClockHolder(
 				ChessclockBinding.inflate(
 					LayoutInflater.from(parent.context),
 					parent,
@@ -57,27 +66,26 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		}
 	}
 
-	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(data[position].first)
-
-	override fun getItemCount() = data.size
-
-	override fun getItemViewType(position: Int) = data[position].second
-
-	fun updateData() {
-		val tmp = getData()
-		for (i in (0..tmp.lastIndex)) if (tmp[i] != data[i]) notifyItemChanged(i)
-		data = tmp
+	fun updateItems() {
+		val tmp = fetchItems()
+		// payload makes the update way more efficient for some reason
+		for (i in (0..tmp.lastIndex)) if (tmp[i] != items[i]) notifyItemChanged(i, true)
+		items = tmp
 	}
 
-	private fun getData() = arrayOf(
-		Pair(liBoard.board.toString(), TEXT_BIG),
-		Pair(Game(liBoard).toPgn(), TEXT_SMALL),
-		Pair(liBoard.physicalPosition.toString(), TEXT_BIG),
-		Pair(clock.toString(), CLOCK)
+	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+		super.onBindViewHolder(holder, position, payloads)
+	}
+
+	private fun fetchItems() = arrayOf(
+		Item(ID_BOARD, liBoard.board.toString()),
+		Item(ID_MOVES, Game(liBoard).toPgn()),
+		Item(ID_DIAGNOSTICS, liBoard.physicalPosition.toString()),
+		Item(ID_CLOCK, clock.toString())
 	)
 
 	private fun onTick() {
-		updateData()
+		updateItems()
 		if (clock.running) handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
 	}
 
@@ -101,9 +109,25 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	}
 
 	companion object {
-		const val TEXT_BIG = 0
-		const val TEXT_SMALL = 1
-		const val CLOCK = 2
-		const val CLOCK_REFRESH_RATE = 250L
+		const val TYPE_TEXT_BIG = 0
+		const val TYPE_TEXT_SMALL = 1
+		const val TYPE_CLOCK = 2
+		const val TYPE_NONE = -1
+		const val CLOCK_REFRESH_RATE = 10L
+		const val ID_BOARD = 0L
+		const val ID_MOVES = 1L
+		const val ID_DIAGNOSTICS = 2L
+		const val ID_CLOCK = 3L
+	}
+
+	private data class Item(val id: Long, val data: String) {
+		val type
+			get() = when (id) {
+				ID_BOARD -> TYPE_TEXT_BIG
+				ID_DIAGNOSTICS -> TYPE_TEXT_BIG
+				ID_MOVES -> TYPE_TEXT_SMALL
+				ID_CLOCK -> TYPE_CLOCK
+				else -> TYPE_NONE
+			}
 	}
 }
