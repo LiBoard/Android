@@ -85,7 +85,10 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		Item(ID_BOARD, liBoard.board.toString()),
 		Item(ID_MOVES, Game(liBoard).toPgn()),
 		Item(ID_DIAGNOSTICS, liBoard.physicalPosition.toString()),
-		Item(ID_CLOCK, Pair(clock.getCurrentTime(WHITE), clock.getCurrentTime(BLACK)))
+		Item(
+			ID_CLOCK,
+			Triple(clock.getCurrentTime(WHITE), clock.getCurrentTime(BLACK), if (clock.running) clock.side else null)
+		)
 	)
 
 	private fun onTick() {

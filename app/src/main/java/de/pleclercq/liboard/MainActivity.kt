@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
 	private val creditsFragment = CreditsFragment(this)
 	private lateinit var binding: ActivityMainBinding
 
-
 	//region Activity lifecycle
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

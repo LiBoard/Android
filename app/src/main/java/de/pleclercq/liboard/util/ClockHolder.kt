@@ -31,14 +31,10 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 	}
 
 	override fun updateContents(data: Any) {
-		if (data !is Pair<*, *>)
-			throw InvalidClassException("Expected Pair<Int, Int>, got ${data::class.simpleName}")
-		val first = data.first
-		val second = data.second
-		if (first !is Int || second !is Int)
-			throw InvalidClassException("Expected Ints")
+		if (data !is Triple<*, *, *> || data.first !is Int || data.second !is Int || data.third !is Int?)
+			throw InvalidClassException("Expected Triple<Int, Int, Int?>")
 		// TODO Better formatting
-		binding.clockWhite.text = "${first / ChessClock.RESOLUTION}"
-		binding.clockBlack.text = "${second / ChessClock.RESOLUTION}"
+		binding.clockWhite.text = "${data.first as Int / ChessClock.RESOLUTION}"
+		binding.clockBlack.text = "${data.second as Int / ChessClock.RESOLUTION}"
 	}
 }
