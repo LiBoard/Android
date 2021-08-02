@@ -16,8 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.chessclock
+package de.pleclercq.liboard.util
 
-class Stopwatch : ChessClock(TimeControl(0, 0)) {
-    override fun getCurrentTime(_side: Int) = times[_side] + (if (running && _side == side) timeDelta else 0)
+import de.pleclercq.liboard.databinding.ChessclockBinding
+
+class ClockHolder(private val binding: ChessclockBinding) : ViewHolder(binding.root) {
+    override fun updateContents(data: String) {
+        val times = data.split('|')
+        binding.clockWhite.text = times[0]
+        binding.clockBlack.text = times[1]
+    }
+
 }

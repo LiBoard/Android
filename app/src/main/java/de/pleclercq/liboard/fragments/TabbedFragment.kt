@@ -65,6 +65,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
                 0 -> "Board"
                 1 -> "Moves"
                 2 -> "Diagnostics"
+                3 -> "Clock"
                 else -> "Not found"
             }
         }.attach()
@@ -96,15 +97,15 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
     //region LiBoard
     override fun onGameStart() {
-        activity.runOnUiThread { update() }
+        adapter.updateData()
     }
 
     override fun onMove() {
-        activity.runOnUiThread { update() }
+        adapter.updateData()
     }
 
     override fun onNewPhysicalPosition() {
-        activity.runOnUiThread { update() }
+        adapter.updateData()
     }
 
     override fun onConnect() {
@@ -149,11 +150,6 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
             Log.w("exportGame", e)
             Toast.makeText(activity, "An error occurred while exporting", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun update() {
-        adapter.updateData()
-        adapter.notifyDataSetChanged()
     }
 
     private fun gameString() = Game(liBoard).toPgn()

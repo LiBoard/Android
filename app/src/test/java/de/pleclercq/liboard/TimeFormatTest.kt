@@ -16,8 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.chessclock
+package de.pleclercq.liboard
 
-class Stopwatch : ChessClock(TimeControl(0, 0)) {
-    override fun getCurrentTime(_side: Int) = times[_side] + (if (running && _side == side) timeDelta else 0)
+import org.junit.Test
+
+class TimeFormatTest {
+    @Test
+    fun formatDoubleTest() {
+        val white = 1.2354
+        val black = 1.0
+        val s = "%.2f|%.2f".format(white, black)
+        assert(s.matches(Regex("""1.24\|1.00""")))
+    }
 }

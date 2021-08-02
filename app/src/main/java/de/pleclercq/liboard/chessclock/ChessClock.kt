@@ -72,14 +72,20 @@ open class ChessClock(protected val timeControl: TimeControl) {
         times[_side] += timeControl.increments[_side] * RESOLUTION
     }
 
-    open fun getCurrentTime(_side: Int) = times[_side] - (if (_side == side) timeDelta else 0)
+    open fun getCurrentTime(_side: Int) = times[_side] - (if (running && _side == side) timeDelta else 0)
     private fun storeTimes() {
         times = intArrayOf(getCurrentTime(WHITE), getCurrentTime(BLACK))
     }
 
+    override fun toString() =
+        "%.2f|%.2f".format(
+            getCurrentTime(WHITE).toDouble() / RESOLUTION,
+            getCurrentTime(BLACK).toDouble() / RESOLUTION
+        )
+
     companion object {
         const val WHITE = 0
         const val BLACK = 1
-        const val RESOLUTION = 1000 // ms
+        const val RESOLUTION = 1000 // Hz -> 1000Hz = millisecond accuracy
     }
 }

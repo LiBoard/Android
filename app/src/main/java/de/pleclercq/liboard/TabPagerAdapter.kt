@@ -18,18 +18,28 @@
 
 package de.pleclercq.liboard
 
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import de.pleclercq.liboard.chessclock.ChessClock
+import de.pleclercq.liboard.chessclock.TimeControl
+import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
+import de.pleclercq.liboard.util.ClockHolder
 import de.pleclercq.liboard.util.TextViewHolder
 import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
-    private lateinit var data: Array<Pair<String, Int>>
+    private var data = arrayOf<Pair<String, Int>>()
+    private var clock = ChessClock(TimeControl(180, 2))
+    private val handler = Handler(Looper.getMainLooper())
+    private val runnable = Runnable { onTick() }
 
     init {
         updateData()
@@ -39,26 +49,33 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
         return when (viewType) {
             TEXT_BIG -> TextViewHolder(parent.context)
             TEXT_SMALL -> TextViewHolder(parent.context, 12F, TextView.TEXT_ALIGNMENT_TEXT_START)
-            CLOCK -> TextViewHolder(parent.context)
+            CLOCK -> ClockHolder(ChessclockBinding.inflate(LayoutInflater.from(parent.context), parent, false))
             else -> throw NotImplementedError()
         }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.updateContents(data[position].first)
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(data[position].first)
 
     override fun getItemCount() = data.size
 
     override fun getItemViewType(position: Int) = data[position].second
 
     fun updateData() {
-        data = arrayOf(
-            Pair(liBoard.board.toString(), TEXT_BIG),
-            Pair(Game(liBoard).toPgn(), TEXT_SMALL),
-            Pair(liBoard.physicalPosition.toString(), TEXT_BIG),
-            Pair("TODO", CLOCK) // TODO add actual value
-        )
+        val tmp = getData()
+        for (i in (0..tmp.lastIndex)) if (tmp[i] != data[i]) notifyItemChanged(i)
+        data = tmp
+    }
+
+    private fun getData() = arrayOf(
+        Pair(liBoard.board.toString(), TEXT_BIG),
+        Pair(Game(liBoard).toPgn(), TEXT_SMALL),
+        Pair(liBoard.physicalPosition.toString(), TEXT_BIG),
+        Pair(clock.toString(), CLOCK)
+    )
+
+    private fun onTick() {
+        updateData()
+        if (clock.running) handler.postDelayed(runnable, 100)
     }
 
     companion object {
