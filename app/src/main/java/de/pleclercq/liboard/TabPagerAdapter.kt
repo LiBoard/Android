@@ -42,10 +42,6 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
 
-	init {
-		updateData()
-	}
-
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return when (viewType) {
 			TEXT_BIG -> TextViewHolder(parent.context)
@@ -86,7 +82,22 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	}
 
 	private fun onClick(view: View) {
+		when (view.id) {
+			R.id.clock_black -> {
+				clock.side = ChessClock.WHITE
+				startClock()
+			}
+			R.id.clock_stop -> clock.running = false
+			R.id.clock_white -> {
+				clock.side = ChessClock.BLACK
+				startClock()
+			}
+		}
+	}
 
+	private fun startClock() {
+		clock.running = true
+		handler.postDelayed(runnable, 100)
 	}
 
 	companion object {
