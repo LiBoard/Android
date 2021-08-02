@@ -19,7 +19,6 @@
 package de.pleclercq.liboard.util
 
 import android.view.View
-import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
 
@@ -33,8 +32,19 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 	override fun updateContents(data: Any) {
 		if (data !is Triple<*, *, *> || data.first !is Int || data.second !is Int || data.third !is Int?)
 			throw InvalidClassException("Expected Triple<Int, Int, Int?>")
-		// TODO Better formatting
-		binding.clockWhite.text = "${data.first as Int / ChessClock.RESOLUTION}"
-		binding.clockBlack.text = "${data.second as Int / ChessClock.RESOLUTION}"
+		binding.clockWhite.text = formatTime(data.first as Int)
+		binding.clockBlack.text = formatTime(data.second as Int)
+	}
+
+	private fun formatTime(time: Int): String {
+		val hundredths = (time / 10) % 100
+		val seconds = (time / 1000) % 60
+		val minutes = time / 60000
+
+		var formatted = "%02d:%02d".format(minutes, seconds)
+		if (minutes < 1) {
+			formatted += ".${hundredths / (if (seconds < 10) 1 else 10)}"
+		}
+		return formatted
 	}
 }
