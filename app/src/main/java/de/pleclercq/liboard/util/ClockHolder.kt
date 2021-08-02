@@ -19,7 +19,9 @@
 package de.pleclercq.liboard.util
 
 import android.view.View
+import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.databinding.ChessclockBinding
+import java.io.InvalidClassException
 
 class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Unit) : ViewHolder(binding.root) {
 	init {
@@ -28,10 +30,15 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 		binding.clockStop.setOnClickListener(onClick)
 	}
 
-	override fun updateContents(data: String) {
-		val times = data.split('|')
-		binding.clockWhite.text = times[0]
-		binding.clockBlack.text = times[1]
+	override fun updateContents(data: Any) {
+		if (data !is Pair<*, *>)
+			throw InvalidClassException("Expected Pair<Int, Int>, got ${data::class.simpleName}")
+		val first = data.first
+		val second = data.second
+		if (first !is Int || second !is Int)
+			throw InvalidClassException("Expected Ints")
+		// TODO Better formatting
+		binding.clockWhite.text = "${first / ChessClock.RESOLUTION}"
+		binding.clockBlack.text = "${second / ChessClock.RESOLUTION}"
 	}
-
 }

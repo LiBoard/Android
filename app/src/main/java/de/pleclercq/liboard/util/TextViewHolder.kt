@@ -22,6 +22,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.view.ViewGroup
 import android.widget.TextView
+import java.io.InvalidClassException
 
 class TextViewHolder(context: Context, textSize: Float = 30F, textAlignment: Int = TextView.TEXT_ALIGNMENT_CENTER) :
 	ViewHolder(TextView(context).apply {
@@ -32,8 +33,9 @@ class TextViewHolder(context: Context, textSize: Float = 30F, textAlignment: Int
 	}) {
 	private val view = itemView as TextView
 
-	override fun updateContents(data: String) {
-		view.text = data
+	override fun updateContents(data: Any) {
+		if (data is String) view.text = data
+		else throw InvalidClassException("Expected String, got ${data::class.simpleName}")
 	}
 
 	companion object {

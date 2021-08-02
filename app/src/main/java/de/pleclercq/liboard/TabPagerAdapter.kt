@@ -26,6 +26,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.liboard.Game
@@ -68,8 +70,10 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 
 	fun updateItems() {
 		val tmp = fetchItems()
-		// payload makes the update way more efficient for some reason
-		for (i in (0..tmp.lastIndex)) if (tmp[i] != items[i]) notifyItemChanged(i, true)
+		tmp.forEachIndexed { index, item ->
+			// the payload makes the update way more efficient for some reason
+			if (item != items[index]) notifyItemChanged(index, true)
+		}
 		items = tmp
 	}
 
@@ -81,7 +85,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		Item(ID_BOARD, liBoard.board.toString()),
 		Item(ID_MOVES, Game(liBoard).toPgn()),
 		Item(ID_DIAGNOSTICS, liBoard.physicalPosition.toString()),
-		Item(ID_CLOCK, clock.toString())
+		Item(ID_CLOCK, Pair(clock.getCurrentTime(WHITE), clock.getCurrentTime(BLACK)))
 	)
 
 	private fun onTick() {
@@ -92,12 +96,12 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	private fun onClick(view: View) {
 		when (view.id) {
 			R.id.clock_black -> {
-				clock.side = ChessClock.WHITE
+				clock.side = WHITE
 				startClock()
 			}
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_white -> {
-				clock.side = ChessClock.BLACK
+				clock.side = BLACK
 				startClock()
 			}
 		}
@@ -112,7 +116,6 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		const val TYPE_TEXT_BIG = 0
 		const val TYPE_TEXT_SMALL = 1
 		const val TYPE_CLOCK = 2
-		const val TYPE_NONE = -1
 		const val CLOCK_REFRESH_RATE = 10L
 		const val ID_BOARD = 0L
 		const val ID_MOVES = 1L
@@ -120,14 +123,14 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		const val ID_CLOCK = 3L
 	}
 
-	private data class Item(val id: Long, val data: String) {
+	private data class Item(val id: Long, val data: Any) {
 		val type
 			get() = when (id) {
 				ID_BOARD -> TYPE_TEXT_BIG
 				ID_DIAGNOSTICS -> TYPE_TEXT_BIG
 				ID_MOVES -> TYPE_TEXT_SMALL
 				ID_CLOCK -> TYPE_CLOCK
-				else -> TYPE_NONE
+				else -> throw NotImplementedError()
 			}
 	}
 }
