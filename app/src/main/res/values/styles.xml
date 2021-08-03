@@ -9,8 +9,9 @@
 
 	<style name="ClockControl">
 		<item name="background">@drawable/rounded_corners</item>
-		<item name="backgroundTint">@color/Gainsboro</item>
+		<item name="backgroundTint">?attr/colorOnBackground</item>
 		<item name="android:padding">20dp</item>
+		<item name="tint">?attr/colorControlNormal</item>
 	</style>
 
 	<style name="ClockView">

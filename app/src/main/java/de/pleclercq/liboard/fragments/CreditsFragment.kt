@@ -18,12 +18,17 @@
 
 package de.pleclercq.liboard.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebSettingsCompat.FORCE_DARK_OFF
+import androidx.webkit.WebSettingsCompat.FORCE_DARK_ON
+import androidx.webkit.WebViewFeature
 import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.databinding.FragmentCreditsBinding
@@ -40,6 +45,19 @@ class CreditsFragment(private val activity: MainActivity) : Fragment() {
 			"text/html",
 			"base64"
 		)
+
+		if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+			when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+				Configuration.UI_MODE_NIGHT_YES -> {
+					WebSettingsCompat.setForceDark(binding.creditsTextView.settings, FORCE_DARK_ON)
+				}
+				Configuration.UI_MODE_NIGHT_NO, Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+					WebSettingsCompat.setForceDark(binding.creditsTextView.settings, FORCE_DARK_OFF)
+				}
+			}
+		}
+
+
 		return binding.root
 	}
 }
