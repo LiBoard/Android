@@ -37,9 +37,9 @@ open class ChessClock(protected val timeControl: TimeControl) {
 	var running = false
 		set(value) {
 			if (value != field) {
-				if (value)
-					timeSideStarted = sysTime
-				else
+				if (value) {
+					if (flagged == null) timeSideStarted = sysTime
+				} else
 					storeTimes()
 				field = value
 			}

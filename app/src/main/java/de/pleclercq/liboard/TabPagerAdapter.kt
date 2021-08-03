@@ -107,8 +107,10 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	}
 
 	private fun startClock() {
-		clock.running = true
-		handler.post(runnable)
+		if (clock.flagged == null) {
+			clock.running = true
+			handler.post(runnable)
+		}
 	}
 
 	companion object {
