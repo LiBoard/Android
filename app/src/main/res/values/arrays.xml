@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="clock_modes">
+		<item>Independent</item>
+		<item>Synchronized</item>
+		<item>Clock move</item>
+		<item>Stopwatch</item>
+	</string-array>
+	<string-array name="clock_mode_values">
+		<item>independent</item>
+		<item>synchronized</item>
+		<item>clock-move</item>
+		<item>stopwatch</item>
+	</string-array>
+	<string-array name="tc_types">
+		<item>Increment</item>
+		<item>Increment with odds</item>
+		<item>Delay</item>
+	</string-array>
+	<string-array name="tc_type_values">
+		<item>increment</item>
+		<item>odds</item>
+		<item>delay</item>
+	</string-array>
+</resources>
