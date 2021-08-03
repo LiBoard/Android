@@ -81,8 +81,8 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	private fun fetchItems() = arrayOf(
 		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
 		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
-		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString()),
-		Item("Clock", TYPE_CLOCK, clock)
+		Item("Clock", TYPE_CLOCK, clock),
+		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString())
 	)
 
 	private fun onTick() {

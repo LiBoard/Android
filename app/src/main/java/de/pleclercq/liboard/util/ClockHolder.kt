@@ -22,8 +22,7 @@ import android.graphics.Color
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import de.pleclercq.liboard.R.color.Tomato
-import de.pleclercq.liboard.R.color.colorPrimaryLight
+import de.pleclercq.liboard.R.color.*
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
@@ -57,7 +56,7 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 		val color =
 			when {
 				time < 0 -> getColor(Tomato)
-				clock.running && clock.side == side -> getColor(colorPrimaryLight)
+				clock.running && clock.side == side -> getColor(Goldenrod)
 				else -> Color.TRANSPARENT
 			}
 		view.background.setTint(color)
