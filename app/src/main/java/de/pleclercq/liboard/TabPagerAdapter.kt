@@ -98,12 +98,14 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 				clock.side = WHITE
 				startClock()
 			}
-			R.id.clock_stop -> clock.running = false
 			R.id.clock_white -> {
 				clock.side = BLACK
 				startClock()
 			}
+			R.id.clock_stop -> clock.running = false
+			R.id.clock_reset -> clock.reset()
 		}
+		updateItems()
 	}
 
 	private fun startClock() {

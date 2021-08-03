@@ -59,7 +59,7 @@ open class ChessClock(protected val timeControl: TimeControl) {
 		}
 	protected val timeDelta get() = (sysTime - timeSideStarted).toInt()
 
-	private fun reset() {
+	fun reset() {
 		running = false
 		times = initialTimes
 	}
