@@ -8,12 +8,8 @@
 		android:id="@+id/clock_white"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:layout_margin="10dp"
-		android:background="@drawable/rounded_corners"
-		android:gravity="center"
+		android:theme="@style/ClockView"
 		android:rotation="180"
-		android:text="@string/ready"
-		android:textSize="50sp"
 		app:layout_constraintTop_toTopOf="parent"
 		app:layout_constraintBottom_toTopOf="@id/clock_stop" />
 
@@ -36,20 +32,29 @@
 		android:src="@drawable/ic_outline_refresh_24"
 		android:contentDescription="@string/reset"
 		android:theme="@style/ClockControl"
-		app:layout_constraintEnd_toEndOf="@id/clock_black"
+		app:layout_constraintEnd_toStartOf="@id/clock_settings"
 		app:layout_constraintStart_toEndOf="@id/clock_stop"
 		app:layout_constraintTop_toTopOf="@id/clock_stop"
 		app:layout_constraintBottom_toBottomOf="@id/clock_stop" />
+
+	<ImageButton
+		android:id="@+id/clock_settings"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:src="@drawable/ic_baseline_settings_24"
+		android:contentDescription="@string/settings"
+		android:theme="@style/ClockControl"
+		app:layout_constraintTop_toTopOf="@id/clock_stop"
+		app:layout_constraintBottom_toBottomOf="@id/clock_stop"
+		app:layout_constraintStart_toEndOf="@id/clock_reset"
+		app:layout_constraintEnd_toEndOf="@id/clock_black" />
+
 
 	<TextView
 		android:id="@+id/clock_black"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:layout_margin="10dp"
-		android:background="@drawable/rounded_corners"
-		android:gravity="center"
-		android:text="@string/ready"
-		android:textSize="50sp"
+		android:theme="@style/ClockView"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/clock_stop" />
 

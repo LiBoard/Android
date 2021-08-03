@@ -24,6 +24,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
@@ -104,6 +106,8 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 			}
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
+			// TODO add settings
+			R.id.clock_settings -> Toast.makeText(view.context, "Settings not yet implemented", LENGTH_SHORT).show()
 		}
 		updateItems()
 	}
