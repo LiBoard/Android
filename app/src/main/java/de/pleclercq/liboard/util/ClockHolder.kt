@@ -18,33 +18,52 @@
 
 package de.pleclercq.liboard.util
 
+import android.graphics.Color
 import android.view.View
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import de.pleclercq.liboard.R.color.Tomato
+import de.pleclercq.liboard.R.color.colorPrimaryLight
+import de.pleclercq.liboard.chessclock.ChessClock
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
 
 class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Unit) : ViewHolder(binding.root) {
+	private val clockViews = arrayOf(binding.clockWhite, binding.clockBlack)
+
 	init {
-		binding.clockBlack.setOnClickListener(onClick)
-		binding.clockWhite.setOnClickListener(onClick)
+		clockViews.forEach { it.setOnClickListener(onClick) }
 		binding.clockStop.setOnClickListener(onClick)
 	}
 
 	override fun updateContents(data: Any) {
-		if (data !is Triple<*, *, *> || data.first !is Int || data.second !is Int || data.third !is Int?)
-			throw InvalidClassException("Expected Triple<Int, Int, Int?>")
-		binding.clockWhite.text = formatTime(data.first as Int)
-		binding.clockBlack.text = formatTime(data.second as Int)
+		if (data !is ChessClock) throw InvalidClassException("Expected ChessClock, got ${data::class.simpleName}")
+		binding.clockWhite.text = formatTime(data.getCurrentTime(WHITE))
+		binding.clockBlack.text = formatTime(data.getCurrentTime(BLACK))
+		for (i in clockViews.indices) updateClockView(data, i)
 	}
 
 	private fun formatTime(time: Int): String {
-		val hundredths = (time / 10) % 100
+		val tenths = (time / 100) % 10
 		val seconds = (time / 1000) % 60
 		val minutes = time / 60000
 
-		var formatted = "%02d:%02d".format(minutes, seconds)
-		if (minutes < 1) {
-			formatted += ".${hundredths / (if (seconds < 10) 1 else 10)}"
-		}
-		return formatted
+		return "%02d:%02d".format(minutes, seconds) + if (minutes < 1) "%01d".format(tenths) else ""
 	}
+
+	private fun updateClockView(clock: ChessClock, side: Int) {
+		val view = clockViews[side]
+		val time = clock.getCurrentTime(side)
+		val color =
+			when {
+				time < 0 -> getColor(Tomato)
+				clock.running && clock.side == side -> getColor(colorPrimaryLight)
+				else -> Color.TRANSPARENT
+			}
+		view.background.setTint(color)
+	}
+
+	private fun getColor(@ColorRes colorRes: Int) = ContextCompat.getColor(binding.root.context, colorRes)
 }

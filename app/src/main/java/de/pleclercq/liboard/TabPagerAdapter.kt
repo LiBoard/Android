@@ -39,19 +39,14 @@ import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
-	private var clock = ChessClock(TimeControl(180, 2))
+	private var clock = ChessClock(TimeControl(90, 2))
 	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
 
-	init {
-		setHasStableIds(true)
-	}
-
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
 	override fun getItemCount() = items.size
 	override fun getItemViewType(position: Int) = items[position].type
-	override fun getItemId(position: Int) = items[position].id
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return when (viewType) {
@@ -72,7 +67,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		val tmp = fetchItems()
 		tmp.forEachIndexed { index, item ->
 			// the payload makes the update way more efficient for some reason
-			if (item != items[index]) notifyItemChanged(index, true)
+			if (item.data is ChessClock || item != items[index]) notifyItemChanged(index, true)
 		}
 		items = tmp
 	}
@@ -82,18 +77,18 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	}
 
 	private fun fetchItems() = arrayOf(
-		Item(ID_BOARD, liBoard.board.toString()),
-		Item(ID_MOVES, Game(liBoard).toPgn()),
-		Item(ID_DIAGNOSTICS, liBoard.physicalPosition.toString()),
-		Item(
-			ID_CLOCK,
-			Triple(clock.getCurrentTime(WHITE), clock.getCurrentTime(BLACK), if (clock.running) clock.side else null)
-		)
+		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
+		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
+		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString()),
+		Item("Clock", TYPE_CLOCK, clock)
 	)
 
 	private fun onTick() {
 		updateItems()
-		if (clock.running) handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
+		if (clock.running) {
+			if (clock.flagged != null) clock.running = false
+			else handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
+		}
 	}
 
 	private fun onClick(view: View) {
@@ -119,21 +114,8 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		const val TYPE_TEXT_BIG = 0
 		const val TYPE_TEXT_SMALL = 1
 		const val TYPE_CLOCK = 2
-		const val CLOCK_REFRESH_RATE = 10L
-		const val ID_BOARD = 0L
-		const val ID_MOVES = 1L
-		const val ID_DIAGNOSTICS = 2L
-		const val ID_CLOCK = 3L
+		const val CLOCK_REFRESH_RATE = 50L
 	}
 
-	private data class Item(val id: Long, val data: Any) {
-		val type
-			get() = when (id) {
-				ID_BOARD -> TYPE_TEXT_BIG
-				ID_DIAGNOSTICS -> TYPE_TEXT_BIG
-				ID_MOVES -> TYPE_TEXT_SMALL
-				ID_CLOCK -> TYPE_CLOCK
-				else -> throw NotImplementedError()
-			}
-	}
+	private data class Item(val title: String, val type: Int, val data: Any)
 }
