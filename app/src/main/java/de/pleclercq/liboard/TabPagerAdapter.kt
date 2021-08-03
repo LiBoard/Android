@@ -63,6 +63,12 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 		}
 	}
 
+	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+		super.onBindViewHolder(holder, position, payloads)
+	}
+
+	fun getTitle(position: Int) = items[position].title
+
 	fun updateItems() {
 		val tmp = fetchItems()
 		tmp.forEachIndexed { index, item ->
@@ -70,10 +76,6 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 			if (item.data is ChessClock || item != items[index]) notifyItemChanged(index, true)
 		}
 		items = tmp
-	}
-
-	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-		super.onBindViewHolder(holder, position, payloads)
 	}
 
 	private fun fetchItems() = arrayOf(
@@ -86,8 +88,7 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 	private fun onTick() {
 		updateItems()
 		if (clock.running) {
-			if (clock.flagged != null) clock.running = false
-			else handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
+			if (clock.flagged == null) handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
 		}
 	}
 

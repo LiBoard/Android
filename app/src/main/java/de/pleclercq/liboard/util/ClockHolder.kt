@@ -25,10 +25,9 @@ import androidx.core.content.ContextCompat
 import de.pleclercq.liboard.R.color.Tomato
 import de.pleclercq.liboard.R.color.colorPrimaryLight
 import de.pleclercq.liboard.chessclock.ChessClock
-import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
-import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
+import kotlin.math.max
 
 class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Unit) : ViewHolder(binding.root) {
 	private val clockViews = arrayOf(binding.clockWhite, binding.clockBlack)
@@ -40,8 +39,6 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 
 	override fun updateContents(data: Any) {
 		if (data !is ChessClock) throw InvalidClassException("Expected ChessClock, got ${data::class.simpleName}")
-		binding.clockWhite.text = formatTime(data.getCurrentTime(WHITE))
-		binding.clockBlack.text = formatTime(data.getCurrentTime(BLACK))
 		for (i in clockViews.indices) updateClockView(data, i)
 	}
 
@@ -50,12 +47,13 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 		val seconds = (time / 1000) % 60
 		val minutes = time / 60000
 
-		return "%02d:%02d".format(minutes, seconds) + if (minutes < 1) "%01d".format(tenths) else ""
+		return "%02d:%02d".format(minutes, seconds) + if (minutes < 1) ".%01d".format(tenths) else ""
 	}
 
 	private fun updateClockView(clock: ChessClock, side: Int) {
 		val view = clockViews[side]
 		val time = clock.getCurrentTime(side)
+		view.text = formatTime(max(0, time))
 		val color =
 			when {
 				time < 0 -> getColor(Tomato)
