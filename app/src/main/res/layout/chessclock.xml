@@ -8,7 +8,7 @@
 		android:id="@+id/clock_white"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:theme="@style/ClockView"
+		style="@style/ClockView"
 		android:rotation="180"
 		app:layout_constraintTop_toTopOf="parent"
 		app:layout_constraintBottom_toTopOf="@id/clock_stop" />
@@ -54,7 +54,7 @@
 		android:id="@+id/clock_black"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:theme="@style/ClockView"
+		style="@style/ClockView"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintTop_toBottomOf="@id/clock_stop" />
 
