@@ -22,6 +22,7 @@ import android.graphics.Color
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import de.pleclercq.liboard.R.color.Goldenrod
 import de.pleclercq.liboard.R.color.Tomato
 import de.pleclercq.liboard.chessclock.ChessClock
@@ -33,8 +34,7 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 	private val clockViews = arrayOf(binding.clockWhite, binding.clockBlack)
 
 	init {
-		clockViews.forEach { it.setOnClickListener(onClick) }
-		binding.clockStop.setOnClickListener(onClick)
+		for (child in binding.root.children) child.setOnClickListener(onClick)
 	}
 
 	override fun updateContents(data: Any) {
