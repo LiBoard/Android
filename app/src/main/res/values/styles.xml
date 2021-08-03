@@ -7,4 +7,9 @@
 		<item name="colorAccent">@color/colorSecondary</item>
 	</style>
 
+	<style name="ClockControl">
+		<item name="background">@drawable/rounded_corners</item>
+		<item name="backgroundTint">@color/Gainsboro</item>
+		<item name="android:padding">20dp</item>
+	</style>
 </resources>
