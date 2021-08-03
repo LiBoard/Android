@@ -18,9 +18,11 @@
 
 package de.pleclercq.liboard.chessclock
 
+import kotlin.math.min
+
 class DelayClock(timeControl: TimeControl) : ChessClock(timeControl) {
 	override fun getCurrentTime(_side: Int) =
-		maxOf(times[_side] - (timeControl.increments[_side] * RESOLUTION), super.getCurrentTime(_side))
+		min(times[_side], super.getCurrentTime(_side) + (timeControl.increments[_side] * RESOLUTION))
 
 	override fun applyIncrement(_side: Int) {}
 }
