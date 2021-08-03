@@ -22,7 +22,8 @@ import android.graphics.Color
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
-import de.pleclercq.liboard.R.color.*
+import de.pleclercq.liboard.R.color.Goldenrod
+import de.pleclercq.liboard.R.color.Tomato
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
@@ -50,16 +51,17 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 	}
 
 	private fun updateClockView(clock: ChessClock, side: Int) {
-		val view = clockViews[side]
-		val time = clock.getCurrentTime(side)
-		view.text = formatTime(max(0, time))
-		val color =
-			when {
-				time < 0 -> getColor(Tomato)
-				clock.running && clock.side == side -> getColor(Goldenrod)
-				else -> Color.TRANSPARENT
-			}
-		view.background.setTint(color)
+		binding.clockStop.isEnabled = clock.running
+		clockViews[side].apply {
+			text = formatTime(max(0, clock.getCurrentTime(side)))
+			background.setTint(
+				when {
+					clock.flagged == side -> getColor(Tomato)
+					clock.running && clock.side == side -> getColor(Goldenrod)
+					else -> Color.TRANSPARENT
+				}
+			)
+		}
 	}
 
 	private fun getColor(@ColorRes colorRes: Int) = ContextCompat.getColor(binding.root.context, colorRes)
