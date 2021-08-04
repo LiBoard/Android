@@ -20,13 +20,11 @@ package de.pleclercq.liboard.fragments
 
 import android.os.Bundle
 import android.text.InputType
-import androidx.preference.DropDownPreference
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.*
 import de.pleclercq.liboard.R
 
 class ChessClockPreferenceFragment : PreferenceFragmentCompat() {
+	val prefs = preferenceManager.sharedPreferences
 	val prefScreen = preferenceManager.createPreferenceScreen(context).apply {
 		DropDownPreference(context).apply {
 			key = "clock-mode"
@@ -35,7 +33,7 @@ class ChessClockPreferenceFragment : PreferenceFragmentCompat() {
 			entryValues = resources.getStringArray(R.array.clock_mode_values)
 		}.let { addPreference(it) }
 	}
-	val timeControlCategory = PreferenceCategory(context).apply {
+	val tcCategory = PreferenceCategory(context).apply {
 		title = "Time control"
 		key = "tc-prefs"
 		DropDownPreference(context).apply {
@@ -47,29 +45,74 @@ class ChessClockPreferenceFragment : PreferenceFragmentCompat() {
 	}
 	val tcParams = PreferenceCategory(context).apply {
 		key = "tc-params"
-		EditTextPreference(context).apply {
-			key = "tc-init"
-			title = "Initial time"
-			setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
-		}.let { addPreference(it) }
-		DropDownPreference(context).apply {
-			key = "tc-init-unit"
-			entries = arrayOf("min", "s")
-			entryValues = entries
-		}.let { addPreference(it) }
-		EditTextPreference(context).apply {
-			key = "tc-inc"
-			title = "Initial time"
-			setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
-		}.let { addPreference(it) }
-		DropDownPreference(context).apply {
-			key = "tc-inc-unit"
-			entries = arrayOf("min", "s")
-			entryValues = entries
-		}.let { addPreference(it) }
+		makeTcParams("")
+	}
+	val tcParamsOdds = PreferenceCategory(context).apply {
+		key = "tc-params-odds"
+		makeTcParams("-white")
+		makeTcParams("-black")
 	}
 
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-		TODO("Not yet implemented")
+		for (g in arrayOf(prefScreen, tcCategory, tcParams, tcParamsOdds))
+			g.children.forEach { it.setOnPreferenceChangeListener { pref, newVal -> onPrefChange(pref, newVal) } }
+		if (prefs.getString("tc-clock-mode", "independent") != "stopwatch") {
+			when (prefs.getString("tc-type", "increment")) {
+				"odds" -> tcParamsOdds
+				"delay" -> tcParams.apply { tcParams.findPreference<EditTextPreference>("tc-inc")!!.title = "Delay" }
+				else -> tcParams.apply { findPreference<EditTextPreference>("tc-inc")!!.title = "Increment" }
+			}.let { tcCategory.addPreference(it) }
+			prefScreen.addPreference(tcCategory)
+		}
+		preferenceScreen = prefScreen
+	}
+
+	private fun onPrefChange(pref: Preference, newVal: Any?): Boolean {
+		when (pref.key) {
+			"clock-mode" -> when (newVal as String) {
+				"stopwatch" -> prefScreen.removePreference(tcCategory)
+				else -> prefScreen.addPreference(tcCategory)
+			}
+			"tc-type" -> when (newVal as String) {
+				"odds" -> {
+					tcCategory.removePreference(tcParams)
+					tcCategory.addPreference(tcParamsOdds)
+				}
+				"delay" -> {
+					tcCategory.removePreference(tcParamsOdds)
+					tcCategory.addPreference(tcParams)
+					tcParams.findPreference<EditTextPreference>("tc-inc")!!.title = "Delay"
+				}
+				else -> {
+					tcCategory.removePreference(tcParamsOdds)
+					tcCategory.addPreference(tcParams)
+					tcParams.findPreference<EditTextPreference>("tc-inc")!!.title = "Increment"
+				}
+			}
+		}
+		return true
+	}
+
+	private fun PreferenceCategory.makeTcParams(suffix: String) {
+		EditTextPreference(context).apply {
+			key = "tc-init$suffix"
+			title = "Initial time"
+			setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
+		}.let { addPreference(it) }
+		DropDownPreference(context).apply {
+			key = "tc-init-unit$suffix"
+			entries = arrayOf("min", "s")
+			entryValues = entries
+		}.let { addPreference(it) }
+		EditTextPreference(context).apply {
+			key = "tc-inc$suffix"
+			title = "Increment"
+			setOnBindEditTextListener { it.inputType = InputType.TYPE_CLASS_NUMBER }
+		}.let { addPreference(it) }
+		DropDownPreference(context).apply {
+			key = "tc-inc-unit$suffix"
+			entries = arrayOf("min", "s")
+			entryValues = entries
+		}.let { addPreference(it) }
 	}
 }

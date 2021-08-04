@@ -35,7 +35,7 @@ import com.github.bhlangonijr.chesslib.move.MoveList
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
-class LiBoard(private val activity: Activity, private var eventHandler: LiBoardEventHandler) {
+class LiBoard(internal val activity: Activity, private var eventHandler: LiBoardEventHandler) {
 	val isConnected get() = connection != null
 	lateinit var board: Board
 		private set

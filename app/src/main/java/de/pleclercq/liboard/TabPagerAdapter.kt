@@ -26,12 +26,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.databinding.ChessclockBinding
+import de.pleclercq.liboard.fragments.ClockDialogFragment
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
@@ -107,7 +109,9 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
 			// TODO add settings
-			R.id.clock_settings -> Toast.makeText(view.context, "Settings not yet implemented", LENGTH_SHORT).show()
+			R.id.clock_settings -> {
+				ClockDialogFragment().show((liBoard.activity as MainActivity).supportFragmentManager, "")
+			}
 		}
 		updateItems()
 	}
