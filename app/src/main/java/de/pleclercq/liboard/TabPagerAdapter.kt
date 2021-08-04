@@ -44,7 +44,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	RecyclerView.Adapter<ViewHolder>() {
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
 	private val observeMoves
-		get() = prefs.getString("clock_mode", "") != "independent"
+		get() = prefs.getString("clock_mode", "")!!.matches(Regex("synchronized|stopwatch"))
 	internal var clock = prefs.makeClock()
 		set(value) {
 			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
@@ -123,7 +123,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	}
 
 	private fun onClockTapped(side: Int) {
-		if (!clock.running || (clock.running && liBoard.tryClockSwitch()))
+		if (!clock.running || (!observeMoves && liBoard.tryClockSwitch()))
 			clock.side = (side + 1) % 2
 		startClock()
 	}
