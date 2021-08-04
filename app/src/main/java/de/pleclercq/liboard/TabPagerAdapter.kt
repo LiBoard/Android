@@ -18,13 +18,13 @@
 
 package de.pleclercq.liboard
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
@@ -42,7 +42,14 @@ import de.pleclercq.liboard.util.ViewHolder
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>() {
-	internal var clock = activity.getPreferences(Context.MODE_PRIVATE).makeClock()
+	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+	private val observeMoves
+		get() = prefs.getString("clock_mode", "") != "independent"
+	internal var clock = prefs.makeClock()
+		set(value) {
+			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
+			field = value
+		}
 	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
@@ -81,6 +88,11 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		items = tmp
 	}
 
+	fun onBoardMove() {
+		if (observeMoves)
+			clock.side = (clock.side + 1) % 2
+	}
+
 	private fun fetchItems() = arrayOf(
 		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
 		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
@@ -97,23 +109,23 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 
 	private fun onClick(view: View) {
 		when (view.id) {
-			R.id.clock_black -> {
-				clock.side = WHITE
-				startClock()
-			}
-			R.id.clock_white -> {
-				clock.side = BLACK
-				startClock()
-			}
+			R.id.clock_black -> onClockTapped(BLACK)
+			R.id.clock_white -> onClockTapped(WHITE)
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
 			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
-				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment(activity, this@TabPagerAdapter))
+				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment(this@TabPagerAdapter))
 				addToBackStack("clock settings")
 				commit()
 			}
 		}
 		updateItems()
+	}
+
+	private fun onClockTapped(side: Int) {
+		if (!clock.running || (clock.running && liBoard.tryClockSwitch()))
+			clock.side = (side + 1) % 2
+		startClock()
 	}
 
 	private fun startClock() {

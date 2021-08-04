@@ -21,7 +21,6 @@ package de.pleclercq.liboard.fragments
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
-import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.TabPagerAdapter
 import de.pleclercq.liboard.chessclock.ChessClock
@@ -30,7 +29,7 @@ import de.pleclercq.liboard.chessclock.Stopwatch
 import de.pleclercq.liboard.chessclock.TimeControl
 
 @ExperimentalUnsignedTypes
-class ChessClockPreferenceFragment(private val activity: MainActivity, private val adapter: TabPagerAdapter) :
+class ChessClockPreferenceFragment(private val adapter: TabPagerAdapter) :
 	PreferenceFragmentCompat() {
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.clock_prefs, null)
@@ -48,7 +47,7 @@ fun SharedPreferences.makeClock() = when (getString("clock_mode", "")) {
 	else -> {
 		val colors = arrayOf("white", "black")
 		val timeControl = TimeControl(
-			colors.map { getString("tc_init_$it", "0")!!.toInt() }.toIntArray(),
+			colors.map { getString("tc_init_$it", "0")!!.toInt() * 60 }.toIntArray(),
 			colors.map { getString("tc_inc_$it", "0")!!.toInt() }.toIntArray()
 		)
 		when (getString("tc_type", "")) {

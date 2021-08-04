@@ -90,10 +90,12 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
 	//region LiBoard
 	override fun onGameStart() {
+		adapter.clock.reset()
 		adapter.updateItems()
 	}
 
 	override fun onMove() {
+		adapter.onBoardMove()
 		adapter.updateItems()
 	}
 
