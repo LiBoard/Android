@@ -59,7 +59,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
 		val tl = binding.tabLayout
 		val vp = binding.viewPager
-		adapter = TabPagerAdapter(liBoard)
+		adapter = TabPagerAdapter(activity, liBoard)
 		vp.adapter = adapter
 		TabLayoutMediator(tl, vp) { tab, i -> tab.text = adapter.getTitle(i) }.attach()
 

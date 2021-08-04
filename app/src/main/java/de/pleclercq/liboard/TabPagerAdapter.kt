@@ -24,16 +24,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.databinding.ChessclockBinding
-import de.pleclercq.liboard.fragments.ClockDialogFragment
+import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
@@ -42,7 +39,8 @@ import de.pleclercq.liboard.util.TextViewHolder
 import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
-class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewHolder>() {
+class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
+	RecyclerView.Adapter<ViewHolder>() {
 	private var clock = ChessClock(TimeControl(90, 2))
 	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
@@ -108,9 +106,10 @@ class TabPagerAdapter(private val liBoard: LiBoard) : RecyclerView.Adapter<ViewH
 			}
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
-			// TODO add settings
-			R.id.clock_settings -> {
-				ClockDialogFragment().show((liBoard.activity as MainActivity).supportFragmentManager, "")
+			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
+				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment())
+				addToBackStack("clock settings")
+				commit()
 			}
 		}
 		updateItems()
