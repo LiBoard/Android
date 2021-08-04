@@ -14,12 +14,10 @@
 	</string-array>
 	<string-array name="tc_types">
 		<item>Increment</item>
-		<item>Increment with odds</item>
 		<item>Delay</item>
 	</string-array>
 	<string-array name="tc_type_values">
 		<item>increment</item>
-		<item>odds</item>
 		<item>delay</item>
 	</string-array>
 </resources>

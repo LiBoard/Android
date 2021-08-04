@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<DropDownPreference
+		android:key="clock_mode"
+		android:title="Mode"
+		android:entries="@array/clock_modes"
+		android:entryValues="@array/clock_mode_values" />
+	<PreferenceCategory
+		android:key="time_control"
+		android:title="Time control">
+		<DropDownPreference
+			android:key="tc_type"
+			android:title="Type"
+			android:entries="@array/tc_types"
+			android:entryValues="@array/tc_type_values" />
+		<PreferenceCategory android:title="White">
+			<EditTextPreference
+				android:key="tc-init"
+				android:title="Initial time [min]"
+				android:dialogLayout="@layout/preference_number" />
+			<EditTextPreference
+				android:key="tc-inc"
+				android:title="Increment [s]"
+				android:dialogLayout="@layout/preference_number" />
+		</PreferenceCategory>
+		<PreferenceCategory android:title="Black">
+			<EditTextPreference
+				android:key="tc-init-odds"
+				android:title="Initial time [min]"
+				android:dialogLayout="@layout/preference_number" />
+			<EditTextPreference
+				android:key="tc-inc-odds"
+				android:title="Increment [s]"
+				android:dialogLayout="@layout/preference_number" />
+		</PreferenceCategory>
+	</PreferenceCategory>
+</PreferenceScreen>
