@@ -18,6 +18,7 @@
 
 package de.pleclercq.liboard
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -28,9 +29,9 @@ import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
-import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
+import de.pleclercq.liboard.fragments.makeClock
 import de.pleclercq.liboard.liboard.Game
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.toPgn
@@ -41,7 +42,7 @@ import de.pleclercq.liboard.util.ViewHolder
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>() {
-	internal var clock = ChessClock(TimeControl(90, 2))
+	internal var clock = activity.getPreferences(Context.MODE_PRIVATE).makeClock()
 	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
