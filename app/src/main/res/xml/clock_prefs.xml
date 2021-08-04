@@ -18,24 +18,24 @@
 			app:useSimpleSummaryProvider="true" />
 		<PreferenceCategory android:title="White">
 			<EditTextPreference
-				android:key="tc-init"
+				android:key="tc_init_white"
 				android:title="Initial time [min]"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true" />
 			<EditTextPreference
-				android:key="tc-inc"
+				android:key="tc_inc_white"
 				android:title="Increment [s]"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true" />
 		</PreferenceCategory>
 		<PreferenceCategory android:title="Black">
 			<EditTextPreference
-				android:key="tc-init-odds"
+				android:key="tc_init_black"
 				android:title="Initial time [min]"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true" />
 			<EditTextPreference
-				android:key="tc-inc-odds"
+				android:key="tc_inc_black"
 				android:title="Increment [s]"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true" />

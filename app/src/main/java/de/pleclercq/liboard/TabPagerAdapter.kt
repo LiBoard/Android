@@ -41,7 +41,7 @@ import de.pleclercq.liboard.util.ViewHolder
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>() {
-	private var clock = ChessClock(TimeControl(90, 2))
+	internal var clock = ChessClock(TimeControl(90, 2))
 	private var items = fetchItems()
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
@@ -107,7 +107,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
 			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
-				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment())
+				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment(activity, this@TabPagerAdapter))
 				addToBackStack("clock settings")
 				commit()
 			}

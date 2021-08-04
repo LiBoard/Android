@@ -20,10 +20,40 @@ package de.pleclercq.liboard.fragments
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
+import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.R
+import de.pleclercq.liboard.TabPagerAdapter
+import de.pleclercq.liboard.chessclock.ChessClock
+import de.pleclercq.liboard.chessclock.DelayClock
+import de.pleclercq.liboard.chessclock.Stopwatch
+import de.pleclercq.liboard.chessclock.TimeControl
 
-class ChessClockPreferenceFragment : PreferenceFragmentCompat() {
+@ExperimentalUnsignedTypes
+class ChessClockPreferenceFragment(private val activity: MainActivity, private val adapter: TabPagerAdapter) :
+	PreferenceFragmentCompat() {
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.clock_prefs, null)
 	}
+
+	override fun onStop() {
+		adapter.clock = when (getString("clock_mode")) {
+			"stopwatch" -> Stopwatch()
+			else -> {
+				val colors = arrayOf("white", "black")
+				val timeControl = TimeControl(
+					colors.map { getInt("tc_init_$it") }.toIntArray(),
+					colors.map { getInt("tc_inc_$it") }.toIntArray()
+				)
+				when (getString("tc_type")) {
+					"increment" -> ChessClock(timeControl)
+					else -> DelayClock(timeControl)
+				}
+			}
+		}
+		adapter.updateItems()
+		super.onStop()
+	}
+
+	private fun getInt(key: String) = preferenceManager.sharedPreferences.getInt(key, 0)
+	private fun getString(key: String) = preferenceManager.sharedPreferences.getString(key, "")
 }
