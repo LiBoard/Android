@@ -5,7 +5,7 @@
 	android:layout_height="match_parent">
 
 	<TextView
-		android:id="@+id/clock_white"
+		android:id="@+id/clock_black"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		style="@style/ClockView"
@@ -20,9 +20,9 @@
 		android:src="@drawable/ic_outline_pause_24"
 		android:contentDescription="@string/pause"
 		android:theme="@style/ClockControl"
-		app:layout_constraintTop_toBottomOf="@id/clock_white"
-		app:layout_constraintBottom_toTopOf="@id/clock_black"
-		app:layout_constraintStart_toStartOf="@id/clock_white"
+		app:layout_constraintTop_toBottomOf="@id/clock_black"
+		app:layout_constraintBottom_toTopOf="@id/clock_white"
+		app:layout_constraintStart_toStartOf="@id/clock_black"
 		app:layout_constraintEnd_toStartOf="@id/clock_reset" />
 
 	<ImageButton
@@ -47,11 +47,11 @@
 		app:layout_constraintTop_toTopOf="@id/clock_stop"
 		app:layout_constraintBottom_toBottomOf="@id/clock_stop"
 		app:layout_constraintStart_toEndOf="@id/clock_reset"
-		app:layout_constraintEnd_toEndOf="@id/clock_black" />
+		app:layout_constraintEnd_toEndOf="@id/clock_white" />
 
 
 	<TextView
-		android:id="@+id/clock_black"
+		android:id="@+id/clock_white"
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		style="@style/ClockView"
