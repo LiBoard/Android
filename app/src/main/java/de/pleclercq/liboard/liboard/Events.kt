@@ -22,28 +22,15 @@ package de.pleclercq.liboard.liboard
  * Handler for game starts, moves and connection related events.
  */
 interface LiBoardEventHandler {
-	/**
-	 * Called when a new game starts.
-	 */
-	fun onGameStart()
+	fun onEvent(e: LiBoardEvent)
+}
 
-	/**
-	 * Called when a legal move is detected.
-	 */
-	fun onMove()
-
-	/**
-	 * Called when the physical board position changes.
-	 */
-	fun onNewPhysicalPosition()
-
-	/**
-	 * Called when a LiBoard is connected.
-	 */
-	fun onConnect()
-
-	/**
-	 * Called when the LiBoard is disconnected.
-	 */
-	fun onDisconnect()
+data class LiBoardEvent(val type: Int) {
+	companion object {
+		const val TYPE_CONNECT = 0
+		const val TYPE_DISCONNECT = 1
+		const val TYPE_NEW_PHYSICAL_POS = 2
+		const val TYPE_GAME_START = 3
+		const val TYPE_MOVE = 4
+	}
 }

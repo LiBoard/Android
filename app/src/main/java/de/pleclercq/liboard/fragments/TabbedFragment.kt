@@ -33,6 +33,11 @@ import de.pleclercq.liboard.R
 import de.pleclercq.liboard.TabPagerAdapter
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
 import de.pleclercq.liboard.util.CreatePgnDocument
 import de.pleclercq.liboard.util.UsbPermissionReceiver
 import java.io.FileOutputStream
@@ -45,6 +50,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
 	private lateinit var adapter: TabPagerAdapter
 
+	//region Lifecycle
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setHasOptionsMenu(true)
@@ -78,7 +84,6 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	}
 	//endregion
 
-	//region UI events
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.export_game -> createDocument.launch("unnamed.pgn")
@@ -86,40 +91,27 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 		}
 		return true
 	}
-	//endregion
 
-	//region LiBoard
-	override fun onGameStart() {
+	override fun onEvent(e: LiBoardEvent) {
 		activity.runOnUiThread {
-			adapter.clock.reset()
-			adapter.updateItems()
+			when (e.type) {
+				TYPE_CONNECT -> binding.connectFab.hide()
+				TYPE_DISCONNECT -> {
+					binding.connectFab.show()
+					Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
+				}
+				TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
+				TYPE_GAME_START -> {
+					adapter.clock.reset()
+					adapter.updateItems()
+				}
+				TYPE_MOVE -> {
+					adapter.onBoardMove()
+					adapter.updateItems()
+				}
+			}
 		}
 	}
-
-	override fun onMove() {
-		activity.runOnUiThread {
-			adapter.onBoardMove()
-			adapter.updateItems()
-		}
-	}
-
-	override fun onNewPhysicalPosition() {
-		activity.runOnUiThread { adapter.updateItems() }
-	}
-
-	override fun onConnect() {
-		activity.runOnUiThread {
-			binding.connectFab.hide()
-		}
-	}
-
-	override fun onDisconnect() {
-		activity.runOnUiThread {
-			binding.connectFab.show()
-			Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
-		}
-	}
-	//endregion
 
 	/**
 	 * Attempts to connect to the physical board.
