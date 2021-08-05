@@ -103,7 +103,7 @@ internal class Connection(activity: Activity, val liboard: LiBoard) :
 	 * Disconnects the board.
 	 */
 	override fun onRunError(e: java.lang.Exception) {
-		Log.e(LOG_TAG, "onRunError")
+		Log.e(LOG_TAG, "onRunError", e)
 		liboard.disconnect()
 	}
 
