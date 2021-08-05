@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.bhlangonijr.chesslib.Side
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
@@ -41,8 +42,10 @@ import de.pleclercq.liboard.util.ViewHolder
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+	private val clockMode
+		get() = prefs.getString("clock_mode", "")!!
 	private val observeMoves
-		get() = prefs.getString("clock_mode", "")!!.matches(Regex("synchronized|stopwatch"))
+		get() = clockMode.matches(Regex("synchronized|stopwatch"))
 	internal var clock = prefs.makeClock()
 		set(value) {
 			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
@@ -101,12 +104,16 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		when (e.type) {
 			LiBoardEvent.TYPE_NEW_PHYSICAL_POS -> updateItems()
 			LiBoardEvent.TYPE_GAME_START -> {
-				clock.reset()
+				if (observeMoves || liBoard.clockMove)
+					clock.reset()
 				updateItems()
 			}
 			LiBoardEvent.TYPE_MOVE -> {
-				if (observeMoves)
-					clock.side = (clock.side + 1) % 2
+				if (observeMoves) {
+					clock.side = if (liBoard.board.sideToMove == Side.WHITE) WHITE else BLACK
+					liBoard.board.sideToMove
+					startClock()
+				}
 				updateItems()
 			}
 		}
@@ -135,8 +142,8 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	}
 
 	private fun onClockTapped(side: Int) {
-		if (!clock.running || (!observeMoves && liBoard.tryClockSwitch()))
-			clock.side = (side + 1) % 2
+		if (!observeMoves && liBoard.tryClockSwitch())
+			clock.side = side.inverted()
 		startClock()
 	}
 
@@ -146,6 +153,8 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			handler.post(runnable)
 		}
 	}
+
+	private fun Int.inverted() = if (this == WHITE) BLACK else WHITE
 	//endregion
 
 	companion object {
