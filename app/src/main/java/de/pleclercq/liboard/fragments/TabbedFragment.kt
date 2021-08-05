@@ -35,9 +35,6 @@ import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
 import de.pleclercq.liboard.util.CreatePgnDocument
 import de.pleclercq.liboard.util.UsbPermissionReceiver
 import java.io.FileOutputStream
@@ -100,15 +97,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 					binding.connectFab.show()
 					Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
 				}
-				TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
-				TYPE_GAME_START -> {
-					adapter.clock.reset()
-					adapter.updateItems()
-				}
-				TYPE_MOVE -> {
-					adapter.onBoardMove()
-					adapter.updateItems()
-				}
+				else -> adapter.onEvent(e)
 			}
 		}
 	}

@@ -32,16 +32,14 @@ import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
 import de.pleclercq.liboard.fragments.makeClock
-import de.pleclercq.liboard.liboard.Game
-import de.pleclercq.liboard.liboard.LiBoard
-import de.pleclercq.liboard.liboard.toPgn
+import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.util.ClockHolder
 import de.pleclercq.liboard.util.TextViewHolder
 import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
-	RecyclerView.Adapter<ViewHolder>() {
+	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
 	private val observeMoves
 		get() = prefs.getString("clock_mode", "")!!.matches(Regex("synchronized|stopwatch"))
@@ -54,6 +52,8 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	private val handler = Handler(Looper.getMainLooper())
 	private val runnable = Runnable { onTick() }
 
+
+	//region Adapter
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
 	override fun getItemCount() = items.size
 	override fun getItemViewType(position: Int) = items[position].type
@@ -88,17 +88,29 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		items = tmp
 	}
 
-	fun onBoardMove() {
-		if (observeMoves)
-			clock.side = (clock.side + 1) % 2
-	}
-
 	private fun fetchItems() = arrayOf(
 		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
 		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
 		Item("Clock", TYPE_CLOCK, clock),
 		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString())
 	)
+	//endregion
+
+	//region Clock
+	override fun onEvent(e: LiBoardEvent) {
+		when (e.type) {
+			LiBoardEvent.TYPE_NEW_PHYSICAL_POS -> updateItems()
+			LiBoardEvent.TYPE_GAME_START -> {
+				clock.reset()
+				updateItems()
+			}
+			LiBoardEvent.TYPE_MOVE -> {
+				if (observeMoves)
+					clock.side = (clock.side + 1) % 2
+				updateItems()
+			}
+		}
+	}
 
 	private fun onTick() {
 		updateItems()
@@ -134,6 +146,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			handler.post(runnable)
 		}
 	}
+	//endregion
 
 	companion object {
 		const val TYPE_TEXT_BIG = 0
