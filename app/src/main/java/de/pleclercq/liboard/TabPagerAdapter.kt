@@ -18,43 +18,32 @@
 
 package de.pleclercq.liboard
 
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.github.bhlangonijr.chesslib.Side
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
-import de.pleclercq.liboard.fragments.makeClock
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.util.ClockHolder
+import de.pleclercq.liboard.util.ClockManager
 import de.pleclercq.liboard.util.TextViewHolder
 import de.pleclercq.liboard.util.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
-	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
-	private val clockMode
-		get() = prefs.getString("clock_mode", "")!!
-	private val observeMoves
-		get() = clockMode.matches(Regex("synchronized|stopwatch"))
-	internal var clock = prefs.makeClock()
+	private val clockManager = ClockManager(activity, liBoard, this)
+	var clock
+		get() = clockManager.clock
 		set(value) {
-			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
-			field = value
+			clockManager.clock = value
 		}
 	private var items = fetchItems()
-	private val handler = Handler(Looper.getMainLooper())
-	private val runnable = Runnable { onTick() }
-
 
 	//region Adapter
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
@@ -100,36 +89,12 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	//endregion
 
 	//region Clock
-	override fun onEvent(e: LiBoardEvent) {
-		when (e.type) {
-			LiBoardEvent.TYPE_NEW_PHYSICAL_POS -> updateItems()
-			LiBoardEvent.TYPE_GAME_START -> {
-				if (observeMoves || liBoard.clockMove)
-					clock.reset()
-				updateItems()
-			}
-			LiBoardEvent.TYPE_MOVE -> {
-				if (observeMoves) {
-					clock.side = if (liBoard.board.sideToMove == Side.WHITE) WHITE else BLACK
-					liBoard.board.sideToMove
-					startClock()
-				}
-				updateItems()
-			}
-		}
-	}
-
-	private fun onTick() {
-		updateItems()
-		if (clock.running) {
-			if (clock.flagged == null) handler.postDelayed(runnable, CLOCK_REFRESH_RATE)
-		}
-	}
+	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
 	private fun onClick(view: View) {
 		when (view.id) {
-			R.id.clock_black -> onClockTapped(BLACK)
-			R.id.clock_white -> onClockTapped(WHITE)
+			R.id.clock_black -> clockManager.onClockTapped(BLACK)
+			R.id.clock_white -> clockManager.onClockTapped(WHITE)
 			R.id.clock_stop -> clock.running = false
 			R.id.clock_reset -> clock.reset()
 			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
@@ -140,21 +105,6 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		}
 		updateItems()
 	}
-
-	private fun onClockTapped(side: Int) {
-		if (!observeMoves && liBoard.tryClockSwitch())
-			clock.side = side.inverted()
-		startClock()
-	}
-
-	private fun startClock() {
-		if (clock.flagged == null) {
-			clock.running = true
-			handler.post(runnable)
-		}
-	}
-
-	private fun Int.inverted() = if (this == WHITE) BLACK else WHITE
 	//endregion
 
 	companion object {
