@@ -16,11 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.liboard
 
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+/**
+ * Handler for game starts, moves and connection related events.
+ */
+interface LiBoardEventHandler {
+	fun onEvent(e: LiBoardEvent)
+}
 
-abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-	abstract fun updateContents(data: Any)
+data class LiBoardEvent(val type: Int) {
+	companion object {
+		const val TYPE_CONNECT = 0
+		const val TYPE_DISCONNECT = 1
+		const val TYPE_NEW_PHYSICAL_POS = 2
+		const val TYPE_GAME_START = 3
+		const val TYPE_MOVE = 4
+	}
 }

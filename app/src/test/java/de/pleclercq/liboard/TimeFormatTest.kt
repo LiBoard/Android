@@ -16,11 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard
 
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+import org.junit.Test
 
-abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-	abstract fun updateContents(data: Any)
+class TimeFormatTest {
+	@Test
+	fun formatDoubleTest() {
+		val white = 1.2354
+		val black = 1.0
+		val s = "%.2f|%.2f".format(white, black)
+		assert(s.matches(Regex("""1.24\|1.00""")))
+	}
 }

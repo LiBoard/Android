@@ -1,9 +1,20 @@
-/*  Copyright (C) 2021  Philipp Leclercq
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version. */
+/*
+ * LiBoard
+ * Copyright (C) 2021 Philipp Leclercq
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 package de.pleclercq.liboard.liboard
 
@@ -23,13 +34,12 @@ fun Board.isCapture(move: Move) = isNormalCapture(move) || isEnPassant(move)
  */
 fun Board.isNormalCapture(move: Move) = getPiece(move.to) != Piece.NONE
 
-// TODO implement 960 castling
 /**
  * Check if a move is castling.
  * This checks for a king moving two squares along one rank. 960 castling is not (currently) supported.
  */
 fun Board.isCastling(move: Move) =
-    getPiece(move.from).pieceType == PieceType.KING && abs(move.from.ordinal - move.to.ordinal) == 2
+	getPiece(move.from).pieceType == PieceType.KING && abs(move.from.ordinal - move.to.ordinal) == 2
 
 /**
  * Checks if a move is en passant.
@@ -56,31 +66,31 @@ fun Board.findMove(from: Int, to: Int) = findMove(Square.squareAt(from), Square.
  * Creates a [Game] no information.
  */
 fun Game(): Game {
-    return Game("",
-        Round(Event().apply {
-            name = ""
-            site = ""
-            startDate = ""
-        }).apply { number = 1 }).apply {
-        whitePlayer = GenericPlayer("", "")
-        blackPlayer = GenericPlayer("", "")
-        result = GameResult.ONGOING
-        plyCount = ""
-        moveText = StringBuilder()
-    }
+	return Game("",
+		Round(Event().apply {
+			name = ""
+			site = ""
+			startDate = ""
+		}).apply { number = 1 }).apply {
+		whitePlayer = GenericPlayer("", "")
+		blackPlayer = GenericPlayer("", "")
+		result = GameResult.ONGOING
+		plyCount = ""
+		moveText = StringBuilder()
+	}
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun Game(liBoard: LiBoard) = Game().apply {
-    halfMoves = liBoard.getMoves()
-    board = liBoard.board
-    result = if (board.isDraw) {
-        GameResult.DRAW
-    } else if (board.isMated) {
-        if (board.sideToMove == Side.WHITE) GameResult.BLACK_WON else GameResult.WHITE_WON
-    } else {
-        GameResult.ONGOING
-    }
+	halfMoves = liBoard.getMoves()
+	board = liBoard.board
+	result = if (board.isDraw) {
+		GameResult.DRAW
+	} else if (board.isMated) {
+		if (board.sideToMove == Side.WHITE) GameResult.BLACK_WON else GameResult.WHITE_WON
+	} else {
+		GameResult.ONGOING
+	}
 }
 
 fun Game.toPgn(): String = this.toPgn(true, true)
