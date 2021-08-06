@@ -70,7 +70,9 @@ class ClockManager(
 	}
 
 	internal fun onClockTapped(side: Int) {
-		if (!observeMoves && liBoard.tryClockSwitch())
+		if (clockMode == "independent" ||
+			(clockMode == "clock-move" && liBoard.board.sideToMove.ordinal == side && liBoard.tryClockSwitch())
+		)
 			clock.side = side.inverted()
 		startClock()
 	}

@@ -61,6 +61,7 @@ open class ChessClock(protected val timeControl: TimeControl) {
 
 	fun reset() {
 		running = false
+		side = WHITE
 		times = initialTimes
 	}
 
