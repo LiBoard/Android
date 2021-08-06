@@ -19,6 +19,8 @@
 package de.pleclercq.liboard.chessclock
 
 import androidx.annotation.Size
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
+import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 
 open class ChessClock(protected val timeControl: TimeControl) {
 	@Size(2)
@@ -79,4 +81,16 @@ open class ChessClock(protected val timeControl: TimeControl) {
 		const val BLACK = 1
 		const val RESOLUTION = 1000 // Hz -> 1000Hz = millisecond accuracy
 	}
+}
+
+data class ClockSnapshot(val tWhite: Int, val tBlack: Int, val flagged: Int?, val running: Boolean, val side: Int) {
+	constructor(clock: ChessClock) : this(
+		clock.getCurrentTime(WHITE),
+		clock.getCurrentTime(BLACK),
+		clock.flagged,
+		clock.running,
+		clock.side
+	)
+
+	fun getCurrentTime(side: Int) = if (side == WHITE) tWhite else tBlack
 }

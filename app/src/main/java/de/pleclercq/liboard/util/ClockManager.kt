@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
 class ClockManager(
-	activity: MainActivity,
+	private val activity: MainActivity,
 	private val liBoard: LiBoard,
 	private val adapter: TabPagerAdapter
 ) :
@@ -88,7 +88,7 @@ class ClockManager(
 	}
 
 	private fun onTick() {
-		adapter.updateItems()
+		activity.runOnUiThread { adapter.updateItems() }
 		if (!clock.running) handle?.cancel(true)
 	}
 

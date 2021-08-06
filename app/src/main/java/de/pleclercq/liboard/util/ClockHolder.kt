@@ -25,7 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import de.pleclercq.liboard.R.color.Goldenrod
 import de.pleclercq.liboard.R.color.Tomato
-import de.pleclercq.liboard.chessclock.ChessClock
+import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import java.io.InvalidClassException
 import kotlin.math.max
@@ -38,7 +38,7 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 	}
 
 	override fun updateContents(data: Any) {
-		if (data !is ChessClock) throw InvalidClassException("Expected ChessClock, got ${data::class.simpleName}")
+		if (data !is ClockSnapshot) throw InvalidClassException("Expected ClockSnapshot, got ${data::class.simpleName}")
 		for (i in clockViews.indices) updateClockView(data, i)
 	}
 
@@ -50,14 +50,14 @@ class ClockHolder(private val binding: ChessclockBinding, onClick: (View) -> Uni
 		return "%02d:%02d".format(minutes, seconds) + if (minutes < 1) ".%01d".format(tenths) else ""
 	}
 
-	private fun updateClockView(clock: ChessClock, side: Int) {
-		binding.clockStop.isEnabled = clock.running
+	private fun updateClockView(snapshot: ClockSnapshot, side: Int) {
+		binding.clockStop.isEnabled = snapshot.running
 		clockViews[side].apply {
-			text = formatTime(max(0, clock.getCurrentTime(side)))
+			text = formatTime(max(0, snapshot.getCurrentTime(side)))
 			background.setTint(
 				when {
-					clock.flagged == side -> getColor(Tomato)
-					clock.running && clock.side == side -> getColor(Goldenrod)
+					snapshot.flagged == side -> getColor(Tomato)
+					snapshot.running && snapshot.side == side -> getColor(Goldenrod)
 					else -> Color.TRANSPARENT
 				}
 			)

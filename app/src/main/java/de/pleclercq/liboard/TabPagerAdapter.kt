@@ -23,9 +23,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
+import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
 import de.pleclercq.liboard.liboard.*
@@ -72,18 +72,15 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	fun getTitle(position: Int) = items[position].title
 
 	fun updateItems() {
-		val tmp = fetchItems()
-		tmp.forEachIndexed { index, item ->
-			// the payload makes the update way more efficient for some reason
-			if (item.data is ChessClock || item != items[index]) notifyItemChanged(index, true)
+		items = fetchItems().apply {
+			indices.filter { get(it) != items[it] }.forEach { notifyItemChanged(it, true) }
 		}
-		items = tmp
 	}
 
 	private fun fetchItems() = arrayOf(
 		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
 		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
-		Item("Clock", TYPE_CLOCK, clock),
+		Item("Clock", TYPE_CLOCK, ClockSnapshot(clock)),
 		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString())
 	)
 	//endregion
