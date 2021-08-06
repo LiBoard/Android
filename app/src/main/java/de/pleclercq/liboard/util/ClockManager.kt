@@ -18,8 +18,6 @@
 
 package de.pleclercq.liboard.util
 
-import android.os.Handler
-import android.os.Looper
 import androidx.preference.PreferenceManager
 import com.github.bhlangonijr.chesslib.Side
 import de.pleclercq.liboard.MainActivity
@@ -29,6 +27,9 @@ import de.pleclercq.liboard.fragments.makeClock
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.LiBoardEvent
 import de.pleclercq.liboard.liboard.LiBoardEventHandler
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
 class ClockManager(
@@ -47,8 +48,9 @@ class ClockManager(
 		get() = prefs.getString("clock_mode", "")!!
 	private val observeMoves
 		get() = clockMode.matches(Regex("synchronized|stopwatch"))
-	private val handler = Handler(Looper.getMainLooper())
+	private val scheduler = Executors.newScheduledThreadPool(1)
 	private val runnable = Runnable { onTick() }
+	private var handle: ScheduledFuture<*>? = null
 
 	override fun onEvent(e: LiBoardEvent) {
 		when (e.type) {
@@ -80,16 +82,19 @@ class ClockManager(
 	private fun startClock() {
 		if (clock.flagged == null) {
 			clock.running = true
-			handler.post(runnable)
+			if (handle == null || handle!!.isCancelled)
+				handle = scheduler.scheduleAtFixedRate(runnable, 0, CLOCK_REFRESH_RATE, TimeUnit.MILLISECONDS)
 		}
 	}
 
 	private fun onTick() {
 		adapter.updateItems()
-		if (clock.running) {
-			if (clock.flagged == null) handler.postDelayed(runnable, TabPagerAdapter.CLOCK_REFRESH_RATE)
-		}
+		if (!clock.running) handle?.cancel(true)
 	}
 
 	private fun Int.inverted() = if (this == ChessClock.WHITE) ChessClock.BLACK else ChessClock.WHITE
+
+	companion object {
+		const val CLOCK_REFRESH_RATE = 100L
+	}
 }

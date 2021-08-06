@@ -91,6 +91,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	//region Clock
 	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
+	//TODO move to ClockHolder
 	private fun onClick(view: View) {
 		when (view.id) {
 			R.id.clock_black -> clockManager.onClockTapped(BLACK)
@@ -111,7 +112,6 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		const val TYPE_TEXT_BIG = 0
 		const val TYPE_TEXT_SMALL = 1
 		const val TYPE_CLOCK = 2
-		const val CLOCK_REFRESH_RATE = 50L
 	}
 
 	private data class Item(val title: String, val type: Int, val data: Any)
