@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.viewHolders
 
 import android.content.Context
 import android.graphics.Typeface

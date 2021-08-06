@@ -29,10 +29,10 @@ import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
 import de.pleclercq.liboard.liboard.*
-import de.pleclercq.liboard.util.ClockHolder
+import de.pleclercq.liboard.viewHolders.ClockHolder
 import de.pleclercq.liboard.util.ClockManager
-import de.pleclercq.liboard.util.TextViewHolder
-import de.pleclercq.liboard.util.ViewHolder
+import de.pleclercq.liboard.viewHolders.TextViewHolder
+import de.pleclercq.liboard.viewHolders.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
