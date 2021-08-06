@@ -41,6 +41,7 @@ import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
 class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEventHandler {
+	private val creditsFragment = CreditsFragment(activity)
 	private lateinit var binding: FragmentTabbedBinding
 	private val liBoard = LiBoard(activity, this)
 	private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
@@ -76,7 +77,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	}
 
 	override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-		inflater.inflate(R.menu.fragment_game, menu)
+		inflater.inflate(R.menu.fragment_tabbed, menu)
 		super.onCreateOptionsMenu(menu, inflater)
 	}
 	//endregion
@@ -84,6 +85,8 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.export_game -> createDocument.launch("unnamed.pgn")
+			R.id.credits -> activity.supportFragmentManager.beginTransaction()
+				.replace(R.id.main_fragment_container_view, creditsFragment).addToBackStack("credits").commit()
 			else -> return false
 		}
 		return true
