@@ -6,7 +6,8 @@
 		android:title="Mode"
 		android:entries="@array/clock_modes"
 		android:entryValues="@array/clock_mode_values"
-		app:useSimpleSummaryProvider="true" />
+		app:useSimpleSummaryProvider="true"
+		android:defaultValue="independent" />
 	<PreferenceCategory
 		android:key="time_control"
 		android:title="Time control">
@@ -15,30 +16,43 @@
 			android:title="Type"
 			android:entries="@array/tc_types"
 			android:entryValues="@array/tc_type_values"
-			app:useSimpleSummaryProvider="true" />
+			app:useSimpleSummaryProvider="true"
+			android:defaultValue="increment" />
 		<PreferenceCategory android:title="White">
 			<EditTextPreference
 				android:key="tc_init_white"
 				android:title="Initial time [min]"
 				android:dialogLayout="@layout/preference_number"
-				app:useSimpleSummaryProvider="true" />
+				app:useSimpleSummaryProvider="true"
+				android:defaultValue="10" />
 			<EditTextPreference
 				android:key="tc_inc_white"
 				android:title="Increment [s]"
 				android:dialogLayout="@layout/preference_number"
-				app:useSimpleSummaryProvider="true" />
+				app:useSimpleSummaryProvider="true"
+				android:defaultValue="5" />
 		</PreferenceCategory>
 		<PreferenceCategory android:title="Black">
 			<EditTextPreference
 				android:key="tc_init_black"
 				android:title="Initial time [min]"
 				android:dialogLayout="@layout/preference_number"
-				app:useSimpleSummaryProvider="true" />
+				app:useSimpleSummaryProvider="true"
+				android:defaultValue="10" />
 			<EditTextPreference
 				android:key="tc_inc_black"
 				android:title="Increment [s]"
 				android:dialogLayout="@layout/preference_number"
-				app:useSimpleSummaryProvider="true" />
+				app:useSimpleSummaryProvider="true"
+				android:defaultValue="5" />
 		</PreferenceCategory>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="UI">
+		<EditTextPreference
+			android:key="refresh_rate"
+			android:title="UI framerate"
+			android:dialogLayout="@layout/preference_number"
+			app:useSimpleSummaryProvider="true"
+			android:defaultValue="10" />
 	</PreferenceCategory>
 </PreferenceScreen>

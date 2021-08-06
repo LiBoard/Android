@@ -51,6 +51,7 @@ class ClockManager(
 	private val scheduler = Executors.newScheduledThreadPool(1)
 	private val runnable = Runnable { onTick() }
 	private var handle: ScheduledFuture<*>? = null
+	private val refreshDelay get() = 1000L / prefs.getString("refresh_rate", "")!!.toInt()
 
 	override fun onEvent(e: LiBoardEvent) {
 		when (e.type) {
@@ -83,7 +84,7 @@ class ClockManager(
 		if (clock.flagged == null) {
 			clock.running = true
 			if (handle == null || handle!!.isCancelled)
-				handle = scheduler.scheduleAtFixedRate(runnable, 0, CLOCK_REFRESH_RATE, TimeUnit.MILLISECONDS)
+				handle = scheduler.scheduleAtFixedRate(runnable, 0, refreshDelay, TimeUnit.MILLISECONDS)
 		}
 	}
 
@@ -93,8 +94,4 @@ class ClockManager(
 	}
 
 	private fun Int.inverted() = if (this == ChessClock.WHITE) ChessClock.BLACK else ChessClock.WHITE
-
-	companion object {
-		const val CLOCK_REFRESH_RATE = 100L
-	}
 }
