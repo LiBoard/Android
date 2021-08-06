@@ -39,12 +39,9 @@ class TextViewHolder(context: Context, textSize: Float = 30F, textAlignment: Int
 	}
 
 	companion object {
-		val LAYOUT_PARAMS = ViewGroup.MarginLayoutParams(
-			ViewGroup.LayoutParams(
-				ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT
-			)
-		).apply { setMargins(10, 10, 10, 10) }
-
+		val LAYOUT_PARAMS = ViewGroup.LayoutParams(
+			ViewGroup.LayoutParams.MATCH_PARENT,
+			ViewGroup.LayoutParams.MATCH_PARENT
+		)
 	}
 }
