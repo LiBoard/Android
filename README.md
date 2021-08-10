@@ -2,11 +2,7 @@
 
 An Android app for
 [LiBoard](https://github.com/LiBoard/LiBoard)
-that allows you to save OTB games as PGNs.
-
-## Planned features
-
-* Chess clock
+that allows you to save OTB games as PGNs and can function as a chess clock.
 
 ## Credits
 
