@@ -42,11 +42,6 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	private var items = fetchItems()
 
 	//region Adapter
-
-	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
-	override fun getItemCount() = items.size
-	override fun getItemViewType(position: Int) = items[position].type
-
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return when (viewType) {
 			TYPE_TEXT_BIG -> TextViewHolder(parent.context)
@@ -61,6 +56,10 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			else -> throw NotImplementedError()
 		}
 	}
+
+	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
+	override fun getItemCount() = items.size
+	override fun getItemViewType(position: Int) = items[position].type
 
 	fun getTitle(position: Int) = items[position].title
 
@@ -83,13 +82,12 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	//endregion
 
 	//region Clock
-
-	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
-
 	fun makeClock() {
 		clockManager.makeClock()
 		updateItems()
 	}
+
+	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
 	//TODO move to ClockHolder
 	private fun onClick(view: View) {
