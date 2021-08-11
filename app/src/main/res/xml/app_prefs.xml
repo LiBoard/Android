@@ -1,12 +1,12 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 	<SwitchPreference
 		app:key="debug"
-		app:title="Show debug information"
+		app:title="@string/show_debug_info"
 		app:defaultValue="false" />
 
 	<DropDownPreference
 		app:key="theme"
-		app:title="Theme"
+		app:title="@string/theme"
 		app:defaultValue="auto"
 		app:entries="@array/themes"
 		app:entryValues="@array/theme_values"

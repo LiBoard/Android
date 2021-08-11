@@ -3,45 +3,45 @@
 	xmlns:app="http://schemas.android.com/apk/res-auto">
 	<DropDownPreference
 		android:key="clock_mode"
-		android:title="Mode"
+		android:title="@string/mode"
 		android:entries="@array/clock_modes"
 		android:entryValues="@array/clock_mode_values"
 		app:useSimpleSummaryProvider="true"
 		android:defaultValue="independent" />
 	<PreferenceCategory
 		android:key="time_control"
-		android:title="Time control">
+		android:title="@string/time_control">
 		<DropDownPreference
 			android:key="tc_type"
-			android:title="Type"
+			android:title="@string/type"
 			android:entries="@array/tc_types"
 			android:entryValues="@array/tc_type_values"
 			app:useSimpleSummaryProvider="true"
 			android:defaultValue="increment" />
-		<PreferenceCategory android:title="White">
+		<PreferenceCategory android:title="@string/white">
 			<EditTextPreference
 				android:key="tc_init_white"
-				android:title="Initial time [min]"
+				android:title="@string/init_time"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true"
 				android:defaultValue="10" />
 			<EditTextPreference
 				android:key="tc_inc_white"
-				android:title="Increment [s]"
+				android:title="@string/increment"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true"
 				android:defaultValue="5" />
 		</PreferenceCategory>
-		<PreferenceCategory android:title="Black">
+		<PreferenceCategory android:title="@string/black">
 			<EditTextPreference
 				android:key="tc_init_black"
-				android:title="Initial time [min]"
+				android:title="@string/init_time"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true"
 				android:defaultValue="10" />
 			<EditTextPreference
 				android:key="tc_inc_black"
-				android:title="Increment [s]"
+				android:title="@string/increment"
 				android:dialogLayout="@layout/preference_number"
 				app:useSimpleSummaryProvider="true"
 				android:defaultValue="5" />
@@ -50,7 +50,7 @@
 	<PreferenceCategory android:title="UI">
 		<EditTextPreference
 			android:key="refresh_rate"
-			android:title="UI framerate"
+			android:title="@string/ui_framerate"
 			android:dialogLayout="@layout/preference_number"
 			app:useSimpleSummaryProvider="true"
 			android:defaultValue="10" />

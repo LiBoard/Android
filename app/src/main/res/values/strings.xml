@@ -22,4 +22,14 @@
 	<string name="pause">Pause</string>
 	<string name="reset">Reset</string>
 	<string name="settings">Settings</string>
+	<string name="show_debug_info">Show debug information</string>
+	<string name="theme">Theme</string>
+	<string name="mode">Mode</string>
+	<string name="time_control">Time control</string>
+	<string name="type">Type</string>
+	<string name="white">White</string>
+	<string name="init_time">Initial time [min]</string>
+	<string name="increment">Increment [s]</string>
+	<string name="black">Black</string>
+	<string name="ui_framerate">UI framerate</string>
 </resources>
