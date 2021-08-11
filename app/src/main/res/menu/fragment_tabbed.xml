@@ -12,6 +12,11 @@
 		android:title="@string/settings"
 		app:showAsAction="never" />
 	<item
+		android:id="@+id/documentation"
+		android:icon="@drawable/ic_outline_menu_book_24"
+		android:title="@string/documentation"
+		app:showAsAction="never" />
+	<item
 		android:id="@+id/credits"
 		android:icon="@drawable/ic_outline_attribution_24"
 		android:title="@string/credits"
