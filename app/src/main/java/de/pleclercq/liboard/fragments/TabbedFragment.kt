@@ -87,9 +87,6 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.export_game -> createDocument.launch("unnamed.pgn")
-			R.id.credits -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
-				.replace(R.id.main_fragment_container_view, CreditsFragment()).addToBackStack("credits")
-				.commit()
 			R.id.app_settings -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
 			R.id.documentation -> Intent(

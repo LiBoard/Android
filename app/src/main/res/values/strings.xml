@@ -6,18 +6,6 @@
 	<string name="credits">Credits</string>
 	<string name="export_game">Export game</string>
 	<string name="stop">Stop</string>
-	<string name="credits_html">
-        <![CDATA[
-            <center><h1>Credits</h1></center></br>
-            <h2>
-                <ul>
-                    <li><a href="https://github.com/bhlangonijr/chesslib">chesslib</a></li>
-                    <li><a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a></li>
-                    <li><a href="https://www.flaticon.com/authors/good-ware">Good Ware</a> for the icon</a></li>
-                </ul>
-            </h2>
-        ]]>
-    </string>
 	<string name="back">Back</string>
 	<string name="pause">Pause</string>
 	<string name="reset">Reset</string>

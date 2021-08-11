@@ -40,8 +40,14 @@ class AboutFragment : Fragment() {
 	}
 	val html = """
 	<center><h1>LiBoard</h1></center></br>
-    <h2>Build time:</h2>BUILD_TIME<br/>
-    <h2>Version name:</h2>VERSION_NAME<br/>
+    <h3>Build time:</h3>BUILD_TIME<br/>
+    <h3>Version name:</h3>VERSION_NAME<br/>
+	<h3>Credits</h3>
+    <ul>
+        <li><a href="https://github.com/bhlangonijr/chesslib">chesslib</a></li>
+        <li><a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a></li>
+        <li><a href="https://www.flaticon.com/authors/good-ware">Good Ware</a> for the icon</a></li>
+    </ul>
 	""".trimIndent().replace("BUILD_TIME", buildTime).replace("VERSION_NAME", BuildConfig.VERSION_NAME)
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
