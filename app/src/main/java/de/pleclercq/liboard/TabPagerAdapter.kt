@@ -29,8 +29,8 @@ import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
 import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
 import de.pleclercq.liboard.liboard.*
-import de.pleclercq.liboard.viewHolders.ClockHolder
 import de.pleclercq.liboard.util.ClockManager
+import de.pleclercq.liboard.viewHolders.ClockHolder
 import de.pleclercq.liboard.viewHolders.TextViewHolder
 import de.pleclercq.liboard.viewHolders.ViewHolder
 
@@ -38,11 +38,6 @@ import de.pleclercq.liboard.viewHolders.ViewHolder
 class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
 	private val clockManager = ClockManager(activity, liBoard, this)
-	var clock
-		get() = clockManager.clock
-		set(value) {
-			clockManager.clock = value
-		}
 	private var items = fetchItems()
 
 	//region Adapter
@@ -76,7 +71,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	private fun fetchItems() = arrayOf(
 		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
 		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
-		Item("Clock", TYPE_CLOCK, ClockSnapshot(clock)),
+		Item("Clock", TYPE_CLOCK, ClockSnapshot(clockManager.clock)),
 		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString())
 	)
 	//endregion
@@ -84,13 +79,18 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	//region Clock
 	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
+	fun makeClock() {
+		clockManager.makeClock()
+		updateItems()
+	}
+
 	//TODO move to ClockHolder
 	private fun onClick(view: View) {
 		when (view.id) {
 			R.id.clock_black -> clockManager.onClockTapped(BLACK)
 			R.id.clock_white -> clockManager.onClockTapped(WHITE)
-			R.id.clock_stop -> clock.running = false
-			R.id.clock_reset -> clock.reset()
+			R.id.clock_stop -> clockManager.clock.running = false
+			R.id.clock_reset -> clockManager.clock.reset()
 			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
 				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment(this@TabPagerAdapter))
 				addToBackStack("clock settings")

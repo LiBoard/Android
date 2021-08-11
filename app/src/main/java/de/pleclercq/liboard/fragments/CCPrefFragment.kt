@@ -18,15 +18,10 @@
 
 package de.pleclercq.liboard.fragments
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.TabPagerAdapter
-import de.pleclercq.liboard.chessclock.ChessClock
-import de.pleclercq.liboard.chessclock.DelayClock
-import de.pleclercq.liboard.chessclock.Stopwatch
-import de.pleclercq.liboard.chessclock.TimeControl
 
 @ExperimentalUnsignedTypes
 class ChessClockPreferenceFragment(private val adapter: TabPagerAdapter) :
@@ -36,23 +31,7 @@ class ChessClockPreferenceFragment(private val adapter: TabPagerAdapter) :
 	}
 
 	override fun onStop() {
-		adapter.clock = preferenceManager.sharedPreferences.makeClock()
-		adapter.updateItems()
+		adapter.makeClock()
 		super.onStop()
-	}
-}
-
-fun SharedPreferences.makeClock() = when (getString("clock_mode", "")) {
-	"stopwatch" -> Stopwatch()
-	else -> {
-		val colors = arrayOf("white", "black")
-		val timeControl = TimeControl(
-			colors.map { getString("tc_init_$it", "0")!!.toInt() * 60 }.toIntArray(),
-			colors.map { getString("tc_inc_$it", "0")!!.toInt() }.toIntArray()
-		)
-		when (getString("tc_type", "")) {
-			"increment" -> ChessClock(timeControl)
-			else -> DelayClock(timeControl)
-		}
 	}
 }

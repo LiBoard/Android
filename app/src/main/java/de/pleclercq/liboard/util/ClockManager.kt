@@ -18,12 +18,15 @@
 
 package de.pleclercq.liboard.util
 
+import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.github.bhlangonijr.chesslib.Side
 import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.TabPagerAdapter
 import de.pleclercq.liboard.chessclock.ChessClock
-import de.pleclercq.liboard.fragments.makeClock
+import de.pleclercq.liboard.chessclock.DelayClock
+import de.pleclercq.liboard.chessclock.Stopwatch
+import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.LiBoardEvent
 import de.pleclercq.liboard.liboard.LiBoardEventHandler
@@ -80,6 +83,10 @@ class ClockManager(
 		startClock()
 	}
 
+	internal fun makeClock() {
+		clock = prefs.makeClock()
+	}
+
 	private fun startClock() {
 		if (clock.flagged == null) {
 			clock.running = true
@@ -94,4 +101,19 @@ class ClockManager(
 	}
 
 	private fun Int.inverted() = if (this == ChessClock.WHITE) ChessClock.BLACK else ChessClock.WHITE
+
+	private fun SharedPreferences.makeClock() = when (getString("clock_mode", "")) {
+		"stopwatch" -> Stopwatch()
+		else -> {
+			val colors = arrayOf("white", "black")
+			val timeControl = TimeControl(
+				colors.map { getString("tc_init_$it", "0")!!.toInt() * 60 }.toIntArray(),
+				colors.map { getString("tc_inc_$it", "0")!!.toInt() }.toIntArray()
+			)
+			when (getString("tc_type", "")) {
+				"increment" -> ChessClock(timeControl)
+				else -> DelayClock(timeControl)
+			}
+		}
+	}
 }
