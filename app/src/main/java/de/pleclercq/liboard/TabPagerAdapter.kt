@@ -65,10 +65,6 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		}
 	}
 
-	override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-		super.onBindViewHolder(holder, position, payloads)
-	}
-
 	fun getTitle(position: Int) = items[position].title
 
 	fun updateItems() {
