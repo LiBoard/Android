@@ -22,4 +22,5 @@
 	<string name="ui_framerate">UI framerate</string>
 	<string name="documentation">Documentation</string>
 	<string name="about">About</string>
+	<string name="share_game">Share game</string>
 </resources>

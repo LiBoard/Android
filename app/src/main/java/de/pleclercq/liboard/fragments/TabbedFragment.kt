@@ -20,6 +20,8 @@ package de.pleclercq.liboard.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.content.Intent.ACTION_SEND
+import android.content.Intent.EXTRA_TEXT
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
@@ -87,12 +89,23 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.export_game -> createDocument.launch("unnamed.pgn")
+			R.id.share_game -> {
+				Intent().apply {
+					action = ACTION_SEND
+					putExtra(EXTRA_TEXT, gameString())
+					type = "text/plain"
+				}.let {
+					Intent.createChooser(it, null)
+				}.let { startActivity(it) }
+			}
 			R.id.app_settings -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
-			R.id.documentation -> Intent(
-				Intent.ACTION_VIEW,
-				Uri.parse("https://liboard.github.io/doc/android")
-			).let { startActivity(it) }
+			R.id.documentation -> {
+				Intent(
+					Intent.ACTION_VIEW,
+					Uri.parse("https://liboard.github.io/doc/android")
+				).let { startActivity(it) }
+			}
 			R.id.about -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, AboutFragment()).addToBackStack("about").commit()
 			else -> return false
