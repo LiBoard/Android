@@ -27,7 +27,7 @@ import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
-import de.pleclercq.liboard.fragments.ChessClockPreferenceFragment
+import de.pleclercq.liboard.fragments.CCPrefFragment
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.util.ClockManager
 import de.pleclercq.liboard.viewHolders.ClockHolder
@@ -92,7 +92,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			R.id.clock_stop -> clockManager.clock.running = false
 			R.id.clock_reset -> clockManager.clock.reset()
 			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
-				replace(R.id.main_fragment_container_view, ChessClockPreferenceFragment(this@TabPagerAdapter))
+				replace(R.id.main_fragment_container_view, CCPrefFragment(this@TabPagerAdapter))
 				addToBackStack("clock settings")
 				commit()
 			}

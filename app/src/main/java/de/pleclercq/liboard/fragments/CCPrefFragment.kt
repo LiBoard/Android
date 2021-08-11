@@ -24,7 +24,7 @@ import de.pleclercq.liboard.R
 import de.pleclercq.liboard.TabPagerAdapter
 
 @ExperimentalUnsignedTypes
-class ChessClockPreferenceFragment(private val adapter: TabPagerAdapter) :
+class CCPrefFragment(private val adapter: TabPagerAdapter) :
 	PreferenceFragmentCompat() {
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 		setPreferencesFromResource(R.xml.clock_prefs, null)
