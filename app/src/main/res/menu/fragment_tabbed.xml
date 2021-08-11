@@ -21,4 +21,9 @@
 		android:icon="@drawable/ic_outline_attribution_24"
 		android:title="@string/credits"
 		app:showAsAction="never" />
+	<item
+		android:id="@+id/about"
+		android:icon="@drawable/ic_outline_help_outline_24"
+		android:title="@string/about"
+		app:showAsAction="never" />
 </menu>

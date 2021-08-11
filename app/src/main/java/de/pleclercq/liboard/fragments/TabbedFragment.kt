@@ -96,6 +96,8 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 				Intent.ACTION_VIEW,
 				Uri.parse("https://liboard.github.io/doc/android")
 			).let { startActivity(it) }
+			R.id.about -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
+				.replace(R.id.main_fragment_container_view, AboutFragment()).addToBackStack("about").commit()
 			else -> return false
 		}
 		return true
