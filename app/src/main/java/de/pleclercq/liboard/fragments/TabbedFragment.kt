@@ -40,6 +40,7 @@ import de.pleclercq.liboard.util.CreatePgnDocument
 import de.pleclercq.liboard.util.UsbPermissionReceiver
 import java.io.FileOutputStream
 
+@Suppress("unused")
 @ExperimentalUnsignedTypes
 class TabbedFragment : Fragment(), LiBoardEventHandler {
 	private lateinit var binding: FragmentTabbedBinding
