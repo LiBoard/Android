@@ -22,7 +22,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 
-
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {

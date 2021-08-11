@@ -16,23 +16,16 @@
  *
  */
 
-package de.pleclercq.liboard.fragments
+package de.pleclercq.liboard
 
-import android.content.SharedPreferences
-import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
-import de.pleclercq.liboard.R
+import android.app.Application
+import androidx.preference.PreferenceManager
 import de.pleclercq.liboard.util.setTheme
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
-	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-		setPreferencesFromResource(R.xml.app_prefs, rootKey)
-		preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-	}
-
-	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-		when (key) {
-			"theme" -> setTheme(sharedPreferences)
-		}
+@Suppress("unused")
+class Application : Application() {
+	override fun onCreate() {
+		super.onCreate()
+		setTheme(PreferenceManager.getDefaultSharedPreferences(this))
 	}
 }
