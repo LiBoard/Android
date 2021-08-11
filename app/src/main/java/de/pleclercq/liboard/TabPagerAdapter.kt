@@ -18,6 +18,7 @@
 
 package de.pleclercq.liboard
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,9 +37,9 @@ import de.pleclercq.liboard.viewHolders.TextViewHolder
 import de.pleclercq.liboard.viewHolders.ViewHolder
 
 @ExperimentalUnsignedTypes
-class TabPagerAdapter(private val activity: MainActivity, private val liBoard: LiBoard) :
+class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard) :
 	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
-	private val clockManager = ClockManager(activity, liBoard, this)
+	private val clockManager = ClockManager(context, liBoard, this)
 	private var items = fetchItems()
 
 	//region Adapter
@@ -75,7 +76,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
 			Item("Clock", TYPE_CLOCK, ClockSnapshot(clockManager.clock))
 		).apply {
-			if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("debug", false))
+			if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false))
 				add(Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString()))
 		}
 	}
@@ -96,7 +97,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 			R.id.clock_white -> clockManager.onClockTapped(WHITE)
 			R.id.clock_stop -> clockManager.clock.running = false
 			R.id.clock_reset -> clockManager.clock.reset()
-			R.id.clock_settings -> activity.supportFragmentManager.beginTransaction().apply {
+			R.id.clock_settings -> (context as MainActivity).supportFragmentManager.beginTransaction().apply {
 				replace(R.id.main_fragment_container_view, CCPrefFragment(this@TabPagerAdapter))
 				addToBackStack("clock settings")
 				commit()

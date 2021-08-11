@@ -18,10 +18,11 @@
 
 package de.pleclercq.liboard.util
 
+import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.github.bhlangonijr.chesslib.Side
-import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.TabPagerAdapter
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.DelayClock
@@ -36,12 +37,12 @@ import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
 class ClockManager(
-	private val activity: MainActivity,
+	private val context: Context,
 	private val liBoard: LiBoard,
 	private val adapter: TabPagerAdapter
 ) :
 	LiBoardEventHandler {
-	private val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 	var clock = prefs.makeClock()
 		set(value) {
 			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
@@ -96,7 +97,7 @@ class ClockManager(
 	}
 
 	private fun onTick() {
-		activity.runOnUiThread { adapter.updateItems() }
+		(context as Activity).runOnUiThread { adapter.updateItems() }
 		if (!clock.running) handle?.cancel(true)
 	}
 

@@ -18,7 +18,7 @@
 
 package de.pleclercq.liboard.liboard
 
-import android.app.Activity
+import android.content.Context
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
@@ -32,7 +32,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
  * A class handling everything related to the board.
  * Handles the serial connection, incoming data and move validation.
  *
- * @param activity The [Activity] this object belongs to. Required for access to system services, permissions etc.
+ * @param context The [Context] this object belongs to. Required for access to system services, permissions etc.
  * @param eventHandler A [LiBoardEventHandler] that is used to react to game starts, moves and connection related events.
  *
  * @property knownPosition The physical position matching [board].
@@ -40,7 +40,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
-class LiBoard(private val activity: Activity, private var eventHandler: LiBoardEventHandler) {
+class LiBoard(private val context: Context, private var eventHandler: LiBoardEventHandler) {
 	val isConnected get() = connection != null
 	lateinit var board: Board
 		private set
@@ -170,7 +170,7 @@ class LiBoard(private val activity: Activity, private var eventHandler: LiBoardE
 	 */
 	fun connect() {
 		if (isConnected) disconnect()
-		connection = Connection(activity, this)
+		connection = Connection(context, this)
 		eventHandler.onEvent(LiBoardEvent(TYPE_CONNECT))
 	}
 

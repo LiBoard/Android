@@ -18,6 +18,7 @@
 
 package de.pleclercq.liboard.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
@@ -26,9 +27,9 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
-import de.pleclercq.liboard.MainActivity
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.TabPagerAdapter
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
@@ -40,7 +41,7 @@ import de.pleclercq.liboard.util.UsbPermissionReceiver
 import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
-class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEventHandler {
+class TabbedFragment : Fragment(), LiBoardEventHandler {
 	private lateinit var binding: FragmentTabbedBinding
 	private lateinit var liBoard: LiBoard
 	private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
@@ -50,8 +51,9 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	//region Lifecycle
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		liBoard = LiBoard(requireContext(), this)
 		setHasOptionsMenu(true)
-		activity.registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
+		requireContext().registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -62,7 +64,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
 		val tl = binding.tabLayout
 		val vp = binding.viewPager
-		adapter = TabPagerAdapter(activity, liBoard)
+		adapter = TabPagerAdapter(requireContext(), liBoard)
 		vp.adapter = adapter
 		TabLayoutMediator(tl, vp) { tab, i -> tab.text = adapter.getTitle(i) }.attach()
 
@@ -71,7 +73,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 
 	override fun onDestroy() {
 		liBoard.disconnect()
-		activity.unregisterReceiver(usbPermissionReceiver)
+		requireContext().unregisterReceiver(usbPermissionReceiver)
 		super.onDestroy()
 	}
 
@@ -87,7 +89,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 			R.id.credits -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, CreditsFragment()).addToBackStack("credits")
 				.commit()
-			R.id.app_settings -> activity.supportFragmentManager.beginTransaction()
+			R.id.app_settings -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
 			else -> return false
 		}
@@ -95,7 +97,7 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	}
 
 	override fun onEvent(e: LiBoardEvent) {
-		activity.runOnUiThread {
+		(requireContext() as Activity).runOnUiThread {
 			when (e.type) {
 				TYPE_CONNECT -> binding.connectFab.hide()
 				TYPE_DISCONNECT -> {
@@ -126,11 +128,12 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	 */
 	private fun saveGame(uri: Uri) {
 		try {
-			activity.contentResolver.openFileDescriptor(uri, "w")?.use { pfd: ParcelFileDescriptor ->
-				FileOutputStream(pfd.fileDescriptor).use { fos: FileOutputStream ->
-					fos.write(gameString().toByteArray())
+			(requireContext() as Activity).contentResolver.openFileDescriptor(uri, "w")
+				?.use { pfd: ParcelFileDescriptor ->
+					FileOutputStream(pfd.fileDescriptor).use { fos: FileOutputStream ->
+						fos.write(gameString().toByteArray())
+					}
 				}
-			}
 		} catch (e: Exception) {
 			Log.w("exportGame", e)
 			Toast.makeText(activity, "An error occurred while exporting", Toast.LENGTH_SHORT).show()

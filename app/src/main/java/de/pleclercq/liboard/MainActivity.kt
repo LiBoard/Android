@@ -25,9 +25,6 @@ import de.pleclercq.liboard.databinding.ActivityMainBinding
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
-	private val tabbedFragment = TabbedFragment(this)
-	private lateinit var binding: ActivityMainBinding
-
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(ActivityMainBinding.inflate(layoutInflater).root)

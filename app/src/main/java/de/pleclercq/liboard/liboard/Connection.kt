@@ -18,7 +18,6 @@
 
 package de.pleclercq.liboard.liboard
 
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -41,9 +40,9 @@ import java.util.concurrent.Executors
  * Closes the serial port when it's closed.
  */
 @ExperimentalUnsignedTypes
-internal class Connection(activity: Activity, val liboard: LiBoard) :
+internal class Connection(context: Context, val liboard: LiBoard) :
 	Closeable, SerialInputOutputManager.Listener {
-	private val usbManager = activity.getSystemService(Context.USB_SERVICE) as UsbManager
+	private val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 	private val port: UsbSerialPort
 	private val data = LinkedList<UByte>()
 
@@ -58,7 +57,7 @@ internal class Connection(activity: Activity, val liboard: LiBoard) :
 			usbManager.requestPermission(
 				driver.device,
 				PendingIntent.getBroadcast(
-					activity,
+					context,
 					0,
 					Intent().apply { action = UsbPermissionReceiver.ACTION },
 					0
