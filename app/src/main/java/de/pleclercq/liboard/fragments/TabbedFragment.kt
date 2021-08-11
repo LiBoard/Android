@@ -41,9 +41,8 @@ import java.io.FileOutputStream
 
 @ExperimentalUnsignedTypes
 class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEventHandler {
-	private val creditsFragment = CreditsFragment(activity)
 	private lateinit var binding: FragmentTabbedBinding
-	private val liBoard = LiBoard(activity, this)
+	private lateinit var liBoard: LiBoard
 	private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
 	private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
 	private lateinit var adapter: TabPagerAdapter
@@ -85,8 +84,11 @@ class TabbedFragment(private val activity: MainActivity) : Fragment(), LiBoardEv
 	override fun onOptionsItemSelected(item: MenuItem): Boolean {
 		when (item.itemId) {
 			R.id.export_game -> createDocument.launch("unnamed.pgn")
-			R.id.credits -> activity.supportFragmentManager.beginTransaction()
-				.replace(R.id.main_fragment_container_view, creditsFragment).addToBackStack("credits").commit()
+			R.id.credits -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
+				.replace(R.id.main_fragment_container_view, CreditsFragment()).addToBackStack("credits")
+				.commit()
+			R.id.app_settings -> activity.supportFragmentManager.beginTransaction()
+				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
 			else -> return false
 		}
 		return true

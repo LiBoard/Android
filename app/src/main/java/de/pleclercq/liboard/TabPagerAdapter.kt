@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
@@ -41,6 +42,7 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 	private var items = fetchItems()
 
 	//region Adapter
+
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.updateContents(items[position].data)
 	override fun getItemCount() = items.size
 	override fun getItemViewType(position: Int) = items[position].type
@@ -68,15 +70,20 @@ class TabPagerAdapter(private val activity: MainActivity, private val liBoard: L
 		}
 	}
 
-	private fun fetchItems() = arrayOf(
-		Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
-		Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
-		Item("Clock", TYPE_CLOCK, ClockSnapshot(clockManager.clock)),
-		Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString())
-	)
+	private fun fetchItems(): List<Item> {
+		return mutableListOf(
+			Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
+			Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
+			Item("Clock", TYPE_CLOCK, ClockSnapshot(clockManager.clock))
+		).apply {
+			if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("debug", false))
+				add(Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString()))
+		}
+	}
 	//endregion
 
 	//region Clock
+
 	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
 	fun makeClock() {
