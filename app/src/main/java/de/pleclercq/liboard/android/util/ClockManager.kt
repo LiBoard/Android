@@ -88,7 +88,7 @@ class ClockManager(
 		if (clockMode == "independent" ||
 			(clockMode == "clock-move" && LiBoard.board.sideToMove.ordinal == side && LiBoard.tryClockSwitch())
 		)
-			clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
+			clock.side = clock.side.inverted()
 		startClock()
 	}
 
@@ -108,6 +108,8 @@ class ClockManager(
 		(context as Activity).runOnUiThread { adapter.updateItems() }
 		if (!clock.running) handle?.cancel(true)
 	}
+
+	private fun Int.inverted() = if (this == ChessClock.WHITE) ChessClock.BLACK else ChessClock.WHITE
 
 	private fun SharedPreferences.makeClock() = when (getString("clock_mode", "")) {
 		"stopwatch" -> Stopwatch()
