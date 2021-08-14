@@ -100,7 +100,7 @@ class ClockManager(
 		if (clock.flagged == null) {
 			clock.running = true
 			if (handle == null || handle!!.isCancelled)
-				handle = scheduler.scheduleAtFixedRate(runnable, 0, refreshDelay, TimeUnit.MILLISECONDS)
+				handle = scheduler.scheduleWithFixedDelay(runnable, 0, refreshDelay, TimeUnit.MILLISECONDS)
 		}
 	}
 
