@@ -23,8 +23,6 @@ import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
-import de.pleclercq.liboard.liboard.LiBoard.board
-import de.pleclercq.liboard.liboard.LiBoard.knownPosition
 import de.pleclercq.liboard.liboard.LiBoard.liftedPieces
 import de.pleclercq.liboard.liboard.LiBoard.physicalPosition
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
@@ -38,7 +36,6 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
  * A class handling everything related to the board.
  * Handles the serial connection, incoming data and move validation.
  *
- * @property knownPosition The physical position matching [board].
  * @property physicalPosition The current physical position.
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
@@ -52,7 +49,6 @@ object LiBoard {
 		private set
 	private val moveList = MoveList()
 	private val liftedPieces = HashSet<Int>()
-	private var knownPosition = PhysicalPosition.STARTING_POSITION
 	private var connection: Connection? = null
 	internal var clockMove = false
 
@@ -62,12 +58,13 @@ object LiBoard {
 
 	//region Position
 	/**
-	 * Tries to find a move that matches the difference between [knownPosition] and [physicalPosition].
+	 * Tries to find a move that matches the difference between the known position and [physicalPosition].
 	 * Makes the move if one was found.
 	 *
 	 * @return whether a move was found
 	 */
 	private fun generateMove(): Boolean {
+		val knownPosition = PhysicalPosition(board)
 		val disappearances = knownPosition.occupiedSquares.minus(physicalPosition.occupiedSquares)
 		val appearances = physicalPosition.occupiedSquares.minus(knownPosition.occupiedSquares)
 		val temporarilyLiftedPieces = liftedPieces.intersect(physicalPosition.occupiedSquares)
@@ -118,10 +115,10 @@ object LiBoard {
 		physicalPosition = position
 		if (position == PhysicalPosition.STARTING_POSITION) {
 			newGame()
-			updateKnownPosition()
+			liftedPieces.clear()
 			broadcastEvent(LiBoardEvent(TYPE_GAME_START))
 		} else {
-			liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
+			liftedPieces.addAll(PhysicalPosition(board).occupiedSquares.minus(this.physicalPosition.occupiedSquares))
 			if (!clockMove) generateMove()
 		}
 	}
@@ -140,11 +137,11 @@ object LiBoard {
 
 	/**
 	 * Called when a new [Move] is detected.
-	 * Updates the [knownPosition], adds the [move] to the [moveList]
+	 * Adds the [move] to the [moveList]
 	 * and broadcasts the corresponding Event.
 	 */
 	private fun onMove(move: Move) {
-		updateKnownPosition()
+		liftedPieces.clear()
 		moveList.addLast(move)
 		broadcastEvent(LiBoardEvent(TYPE_MOVE))
 	}
@@ -157,14 +154,6 @@ object LiBoard {
 		moveList.clear()
 	}
 
-	/**
-	 * Sets [knownPosition] tp [physicalPosition] and clears [liftedPieces].
-	 */
-	private fun updateKnownPosition() {
-		knownPosition = physicalPosition
-		liftedPieces.clear()
-	}
-
 	fun getMoves() = MoveList(moveList)
 
 	fun takeback() {
@@ -174,7 +163,6 @@ object LiBoard {
 		} catch (e: NoSuchElementException) {
 			Log.w("takeback", "Takeback was attempted without any moves played")
 		}
-		knownPosition = PhysicalPosition(board)
 		liftedPieces.clear()
 		broadcastEvent(LiBoardEvent(TYPE_TAKEBACK))
 	}
