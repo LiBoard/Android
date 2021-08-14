@@ -34,12 +34,12 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.android.adapters.TabPagerAdapter
+import de.pleclercq.liboard.android.util.CreatePgnDocument
+import de.pleclercq.liboard.android.util.UsbPermissionReceiver
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
-import de.pleclercq.liboard.android.util.CreatePgnDocument
-import de.pleclercq.liboard.android.util.UsbPermissionReceiver
 import java.io.FileOutputStream
 
 @Suppress("unused")
@@ -98,6 +98,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 					Intent.createChooser(it, null)
 				}.let { startActivity(it) }
 			}
+			R.id.takeback -> liBoard.takeback()
 			R.id.app_settings -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
 			R.id.documentation -> {
@@ -121,7 +122,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 					binding.connectFab.show()
 					Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
 				}
-				else -> adapter.onEvent(e)
+				else -> adapter.clockManager.onEvent(e)
 			}
 		}
 	}

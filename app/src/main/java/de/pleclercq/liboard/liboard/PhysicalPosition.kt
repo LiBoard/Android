@@ -18,6 +18,8 @@
 
 package de.pleclercq.liboard.liboard
 
+import com.github.bhlangonijr.chesslib.Board
+
 /**
  * Represents a physical board position.
  *
@@ -27,6 +29,8 @@ package de.pleclercq.liboard.liboard
 @ExperimentalUnsignedTypes
 internal class PhysicalPosition(val bitboard: ULong) {
 	val occupiedSquares = ((0..63).filter { bitboard and (1UL shl it) != 0UL }).toSet()
+
+	constructor(board: Board) : this(board.bitboard.toULong())
 
 	override fun equals(other: Any?): Boolean {
 		return if (other is PhysicalPosition) {

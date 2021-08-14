@@ -40,8 +40,8 @@ import de.pleclercq.liboard.android.viewHolders.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard) :
-	RecyclerView.Adapter<ViewHolder>(), LiBoardEventHandler {
-	private val clockManager = ClockManager(context, liBoard, this)
+	RecyclerView.Adapter<ViewHolder>() {
+	internal val clockManager = ClockManager(context, liBoard, this)
 	private var items = fetchItems()
 
 	//region Adapter
@@ -89,8 +89,6 @@ class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard
 		clockManager.makeClock()
 		updateItems()
 	}
-
-	override fun onEvent(e: LiBoardEvent) = clockManager.onEvent(e)
 
 	//TODO move to ClockHolder
 	private fun onClick(view: View) {

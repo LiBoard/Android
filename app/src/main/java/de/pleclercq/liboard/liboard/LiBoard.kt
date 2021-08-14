@@ -19,6 +19,7 @@
 package de.pleclercq.liboard.liboard
 
 import android.content.Context
+import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
@@ -27,6 +28,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
 
 /**
  * A class handling everything related to the board.
@@ -162,6 +164,18 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	}
 
 	fun getMoves() = MoveList(moveList)
+
+	fun takeback() {
+		try {
+			moveList.removeLast()
+			board.undoMove()
+		} catch (e: NoSuchElementException) {
+			Log.w("takeback", "Takeback was attempted without any moves played")
+		}
+		knownPosition = PhysicalPosition(board)
+		liftedPieces.clear()
+		eventHandler.onEvent(LiBoardEvent(TYPE_TAKEBACK))
+	}
 	//endregion
 
 	//region Connection
