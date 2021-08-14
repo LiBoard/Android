@@ -19,14 +19,21 @@
 package de.pleclercq.liboard.android
 
 import android.app.Application
+import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import de.pleclercq.liboard.android.util.setTheme
+import de.pleclercq.liboard.liboard.LiBoard
 
 @ExperimentalUnsignedTypes
 @Suppress("unused")
 class Application : Application() {
 	override fun onCreate() {
 		super.onCreate()
-		setTheme(PreferenceManager.getDefaultSharedPreferences(this))
+		init(PreferenceManager.getDefaultSharedPreferences(this))
+	}
+
+	private fun init(preferences: SharedPreferences) {
+		setTheme(preferences)
+		LiBoard.updateMoveDelay(preferences)
 	}
 }

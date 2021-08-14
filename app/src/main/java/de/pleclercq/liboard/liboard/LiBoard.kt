@@ -19,6 +19,9 @@
 package de.pleclercq.liboard.liboard
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
@@ -47,10 +50,13 @@ object LiBoard {
 		private set
 	internal var physicalPosition = PhysicalPosition.STARTING_POSITION
 		private set
+	internal var clockMove = false
+	private var connection: Connection? = null
 	private val moveList = MoveList()
 	private val liftedPieces = HashSet<Int>()
-	private var connection: Connection? = null
-	internal var clockMove = false
+	private val handler = Handler(Looper.getMainLooper())
+	private val generateMoveRunnable = Runnable { generateMove() }
+	private var moveDelay = 0L // ms
 
 	init {
 		newGame()
@@ -111,6 +117,7 @@ object LiBoard {
 	 * or tries to find a legal move matching the position otherwise.
 	 */
 	internal fun onNewPhysicalPosition(position: PhysicalPosition) {
+		handler.removeCallbacks(generateMoveRunnable)
 		broadcastEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
 		physicalPosition = position
 		if (position == PhysicalPosition.STARTING_POSITION) {
@@ -119,7 +126,7 @@ object LiBoard {
 			broadcastEvent(LiBoardEvent(TYPE_GAME_START))
 		} else {
 			liftedPieces.addAll(PhysicalPosition(board).occupiedSquares.minus(this.physicalPosition.occupiedSquares))
-			if (!clockMove) generateMove()
+			if (!clockMove) handler.postDelayed(generateMoveRunnable, moveDelay)
 		}
 	}
 
@@ -191,6 +198,10 @@ object LiBoard {
 	//endregion
 
 	private fun broadcastEvent(e: LiBoardEvent) = eventHandlers.forEach { it.onEvent(e) }
+
+	fun updateMoveDelay(prefs: SharedPreferences) {
+		moveDelay = prefs.getString("move-delay", "0")!!.toLong()
+	}
 
 	fun tryClockSwitch() = if (!clockMove) true else generateMove()
 }
