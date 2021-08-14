@@ -51,10 +51,8 @@ class ClockManager(
 			LiBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
 			field = value
 		}
-	private val clockMode
-		get() = prefs.getString("clock_mode", "")!!
-	private val observeMoves
-		get() = clockMode.matches(Regex("synchronized|stopwatch"))
+	private val clockMode get() = prefs.getString("clock_mode", "")!!
+	private val observeMoves get() = clockMode != "independent"
 	private val scheduler = Executors.newScheduledThreadPool(1)
 	private val runnable = Runnable { onTick() }
 	private var handle: ScheduledFuture<*>? = null
@@ -77,7 +75,7 @@ class ClockManager(
 				adapter.updateItems()
 			}
 			TYPE_TAKEBACK -> {
-				if (observeMoves || clockMode == "clock-move")
+				if (observeMoves)
 					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 				adapter.updateItems()
 			}
@@ -85,10 +83,10 @@ class ClockManager(
 	}
 
 	internal fun onClockTapped(side: Int) {
-		if (clockMode == "independent" ||
-			(clockMode == "clock-move" && LiBoard.board.sideToMove.ordinal == side && LiBoard.tryClockSwitch())
-		)
-			clock.side = clock.side.inverted()
+		if (clockMode == "independent")
+			clock.side = side.inverted()
+		else if (clockMode == "clock-move" && side == LiBoard.board.sideToMove.ordinal)
+			LiBoard.tryClockSwitch()
 		startClock()
 	}
 
