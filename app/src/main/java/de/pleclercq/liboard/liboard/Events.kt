@@ -32,5 +32,6 @@ data class LiBoardEvent(val type: Int) {
 		const val TYPE_NEW_PHYSICAL_POS = 2
 		const val TYPE_GAME_START = 3
 		const val TYPE_MOVE = 4
+		const val TYPE_TAKEBACK = 5
 	}
 }

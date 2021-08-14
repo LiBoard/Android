@@ -30,6 +30,10 @@ import de.pleclercq.liboard.chessclock.Stopwatch
 import de.pleclercq.liboard.chessclock.TimeControl
 import de.pleclercq.liboard.liboard.LiBoard
 import de.pleclercq.liboard.liboard.LiBoardEvent
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
 import de.pleclercq.liboard.liboard.LiBoardEventHandler
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
@@ -59,18 +63,22 @@ class ClockManager(
 
 	override fun onEvent(e: LiBoardEvent) {
 		when (e.type) {
-			LiBoardEvent.TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
-			LiBoardEvent.TYPE_GAME_START -> {
+			TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
+			TYPE_GAME_START -> {
 				if (observeMoves || liBoard.clockMove)
 					clock.reset()
 				adapter.updateItems()
 			}
-			LiBoardEvent.TYPE_MOVE -> {
+			TYPE_MOVE -> {
 				if (observeMoves) {
 					clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
-					liBoard.board.sideToMove
 					startClock()
 				}
+				adapter.updateItems()
+			}
+			TYPE_TAKEBACK -> {
+				if (observeMoves || clockMode == "clock-move")
+					clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 				adapter.updateItems()
 			}
 		}
@@ -80,7 +88,7 @@ class ClockManager(
 		if (clockMode == "independent" ||
 			(clockMode == "clock-move" && liBoard.board.sideToMove.ordinal == side && liBoard.tryClockSwitch())
 		)
-			clock.side = side.inverted()
+			clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 		startClock()
 	}
 

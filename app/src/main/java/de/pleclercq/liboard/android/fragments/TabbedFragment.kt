@@ -121,7 +121,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 					binding.connectFab.show()
 					Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
 				}
-				else -> adapter.onEvent(e)
+				else -> adapter.clockManager.onEvent(e)
 			}
 		}
 	}

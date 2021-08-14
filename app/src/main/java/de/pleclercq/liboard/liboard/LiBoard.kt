@@ -27,6 +27,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
+import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
 
 /**
  * A class handling everything related to the board.
@@ -162,6 +163,14 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	}
 
 	fun getMoves() = MoveList(moveList)
+
+	fun takeback() {
+		moveList.removeLast()
+		board.undoMove()
+		knownPosition = PhysicalPosition(board)
+		liftedPieces.clear()
+		eventHandler.onEvent(LiBoardEvent(TYPE_TAKEBACK))
+	}
 	//endregion
 
 	//region Connection
