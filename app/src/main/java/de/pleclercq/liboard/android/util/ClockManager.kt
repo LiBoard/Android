@@ -71,7 +71,8 @@ class ClockManager(
 			TYPE_MOVE -> {
 				if (observeMoves) {
 					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
-					startClock()
+					if (LiBoard.board.isMated || LiBoard.board.isDraw) clock.running = false
+					else startClock()
 				}
 				adapter.updateItems()
 			}
