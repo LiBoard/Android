@@ -20,12 +20,16 @@ package de.pleclercq.liboard.android.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import de.pleclercq.liboard.R
+import de.pleclercq.liboard.android.fragments.TabbedFragment
 import de.pleclercq.liboard.databinding.ActivityMainBinding
 
 @ExperimentalUnsignedTypes
 class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+		val binding = ActivityMainBinding.inflate(layoutInflater)
+		setContentView(binding.root)
+		supportFragmentManager.beginTransaction().add(R.id.main_fragment_container_view, TabbedFragment()).commit()
 	}
 }
