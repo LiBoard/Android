@@ -19,6 +19,7 @@
 package de.pleclercq.liboard.liboard
 
 import android.content.Context
+import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
@@ -165,8 +166,12 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	fun getMoves() = MoveList(moveList)
 
 	fun takeback() {
-		moveList.removeLast()
-		board.undoMove()
+		try {
+			moveList.removeLast()
+			board.undoMove()
+		} catch (e: NoSuchElementException) {
+			Log.w("takeback", "Takeback was attempted without any moves played")
+		}
 		knownPosition = PhysicalPosition(board)
 		liftedPieces.clear()
 		eventHandler.onEvent(LiBoardEvent(TYPE_TAKEBACK))
