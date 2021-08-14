@@ -16,23 +16,17 @@
  *
  */
 
-package de.pleclercq.liboard.fragments
+package de.pleclercq.liboard.android.util
 
 import android.content.SharedPreferences
-import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
-import de.pleclercq.liboard.R
-import de.pleclercq.liboard.util.setTheme
+import androidx.appcompat.app.AppCompatDelegate
 
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
-	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-		setPreferencesFromResource(R.xml.app_prefs, rootKey)
-		preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-	}
-
-	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-		when (key) {
-			"theme" -> setTheme(sharedPreferences)
+fun setTheme(prefs: SharedPreferences) {
+	AppCompatDelegate.setDefaultNightMode(
+		when (prefs.getString("theme", "auto")) {
+			"light" -> AppCompatDelegate.MODE_NIGHT_NO
+			"dark" -> AppCompatDelegate.MODE_NIGHT_YES
+			else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 		}
-	}
+	)
 }

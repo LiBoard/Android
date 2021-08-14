@@ -16,16 +16,23 @@
  *
  */
 
-package de.pleclercq.liboard
+package de.pleclercq.liboard.android.util
 
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import de.pleclercq.liboard.databinding.ActivityMainBinding
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.hardware.usb.UsbManager
 
 @ExperimentalUnsignedTypes
-class MainActivity : AppCompatActivity() {
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+internal class UsbPermissionReceiver(private val callback: Runnable) : BroadcastReceiver() {
+	override fun onReceive(context: Context?, intent: Intent?) {
+		if (intent != null && intent.action == ACTION
+			&& intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
+		)
+			callback.run()
+	}
+
+	companion object {
+		const val ACTION = "de.pleclercq.liboard.USB_PERMISSION_GRANTED"
 	}
 }

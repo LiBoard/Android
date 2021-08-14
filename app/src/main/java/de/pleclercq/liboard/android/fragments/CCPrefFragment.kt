@@ -16,23 +16,22 @@
  *
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.android.fragments
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.hardware.usb.UsbManager
+import android.os.Bundle
+import androidx.preference.PreferenceFragmentCompat
+import de.pleclercq.liboard.R
+import de.pleclercq.liboard.android.adapters.TabPagerAdapter
 
 @ExperimentalUnsignedTypes
-internal class UsbPermissionReceiver(private val callback: Runnable) : BroadcastReceiver() {
-	override fun onReceive(context: Context?, intent: Intent?) {
-		if (intent != null && intent.action == ACTION
-			&& intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
-		)
-			callback.run()
+class CCPrefFragment(private val adapter: TabPagerAdapter) :
+	PreferenceFragmentCompat() {
+	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+		setPreferencesFromResource(R.xml.clock_prefs, null)
 	}
 
-	companion object {
-		const val ACTION = "de.pleclercq.liboard.USB_PERMISSION_GRANTED"
+	override fun onStop() {
+		adapter.makeClock()
+		super.onStop()
 	}
 }

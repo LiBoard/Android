@@ -16,11 +16,11 @@
  *
  */
 
-package de.pleclercq.liboard
+package de.pleclercq.liboard.android
 
 import android.app.Application
 import androidx.preference.PreferenceManager
-import de.pleclercq.liboard.util.setTheme
+import de.pleclercq.liboard.android.util.setTheme
 
 @Suppress("unused")
 class Application : Application() {

@@ -16,25 +16,27 @@
  *
  */
 
-package de.pleclercq.liboard
+package de.pleclercq.liboard.android.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import de.pleclercq.liboard.R
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.BLACK
 import de.pleclercq.liboard.chessclock.ChessClock.Companion.WHITE
 import de.pleclercq.liboard.chessclock.ClockSnapshot
 import de.pleclercq.liboard.databinding.ChessclockBinding
-import de.pleclercq.liboard.fragments.CCPrefFragment
+import de.pleclercq.liboard.android.fragments.CCPrefFragment
 import de.pleclercq.liboard.liboard.*
-import de.pleclercq.liboard.util.ClockManager
-import de.pleclercq.liboard.viewHolders.ClockHolder
-import de.pleclercq.liboard.viewHolders.TextViewHolder
-import de.pleclercq.liboard.viewHolders.ViewHolder
+import de.pleclercq.liboard.android.util.ClockManager
+import de.pleclercq.liboard.android.viewHolders.ClockHolder
+import de.pleclercq.liboard.android.viewHolders.TextViewHolder
+import de.pleclercq.liboard.android.viewHolders.ViewHolder
 
 @ExperimentalUnsignedTypes
 class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard) :
@@ -97,7 +99,7 @@ class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard
 			R.id.clock_white -> clockManager.onClockTapped(WHITE)
 			R.id.clock_stop -> clockManager.clock.running = false
 			R.id.clock_reset -> clockManager.clock.reset()
-			R.id.clock_settings -> (context as MainActivity).supportFragmentManager.beginTransaction().apply {
+			R.id.clock_settings -> (context as AppCompatActivity).supportFragmentManager.beginTransaction().apply {
 				replace(R.id.main_fragment_container_view, CCPrefFragment(this@TabPagerAdapter))
 				addToBackStack("clock settings")
 				commit()

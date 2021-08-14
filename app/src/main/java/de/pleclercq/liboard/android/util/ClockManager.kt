@@ -16,14 +16,14 @@
  *
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.android.util
 
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import com.github.bhlangonijr.chesslib.Side
-import de.pleclercq.liboard.TabPagerAdapter
+import de.pleclercq.liboard.android.adapters.TabPagerAdapter
 import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.DelayClock
 import de.pleclercq.liboard.chessclock.Stopwatch

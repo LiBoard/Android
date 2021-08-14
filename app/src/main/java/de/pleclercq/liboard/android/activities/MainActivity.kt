@@ -16,11 +16,16 @@
  *
  */
 
-package de.pleclercq.liboard.viewHolders
+package de.pleclercq.liboard.android.activities
 
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import de.pleclercq.liboard.databinding.ActivityMainBinding
 
-abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-	abstract fun updateContents(data: Any)
+@ExperimentalUnsignedTypes
+class MainActivity : AppCompatActivity() {
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		setContentView(ActivityMainBinding.inflate(layoutInflater).root)
+	}
 }

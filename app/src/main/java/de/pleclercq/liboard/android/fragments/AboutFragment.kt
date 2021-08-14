@@ -16,7 +16,7 @@
  *
  */
 
-package de.pleclercq.liboard.fragments
+package de.pleclercq.liboard.android.fragments
 
 import android.content.res.Configuration
 import android.os.Bundle

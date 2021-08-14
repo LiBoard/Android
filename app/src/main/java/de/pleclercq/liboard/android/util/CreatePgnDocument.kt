@@ -16,7 +16,7 @@
  *
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.android.util
 
 import android.app.Activity
 import android.content.Context

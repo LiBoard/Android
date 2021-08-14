@@ -16,7 +16,7 @@
  *
  */
 
-package de.pleclercq.liboard.fragments
+package de.pleclercq.liboard.android.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -33,13 +33,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import de.pleclercq.liboard.R
-import de.pleclercq.liboard.TabPagerAdapter
+import de.pleclercq.liboard.android.adapters.TabPagerAdapter
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
-import de.pleclercq.liboard.util.CreatePgnDocument
-import de.pleclercq.liboard.util.UsbPermissionReceiver
+import de.pleclercq.liboard.android.util.CreatePgnDocument
+import de.pleclercq.liboard.android.util.UsbPermissionReceiver
 import java.io.FileOutputStream
 
 @Suppress("unused")

@@ -28,7 +28,7 @@ import com.hoho.android.usbserial.driver.ProbeTable
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import com.hoho.android.usbserial.util.SerialInputOutputManager
-import de.pleclercq.liboard.util.UsbPermissionReceiver
+import de.pleclercq.liboard.android.util.UsbPermissionReceiver
 import java.io.Closeable
 import java.util.*
 import java.util.concurrent.Executors

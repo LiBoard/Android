@@ -16,7 +16,7 @@
  *
  */
 
-package de.pleclercq.liboard.viewHolders
+package de.pleclercq.liboard.android.viewHolders
 
 import android.content.Context
 import android.graphics.Typeface

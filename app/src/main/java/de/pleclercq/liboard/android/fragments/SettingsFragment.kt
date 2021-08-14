@@ -16,22 +16,23 @@
  *
  */
 
-package de.pleclercq.liboard.fragments
+package de.pleclercq.liboard.android.fragments
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 import de.pleclercq.liboard.R
-import de.pleclercq.liboard.TabPagerAdapter
+import de.pleclercq.liboard.android.util.setTheme
 
-@ExperimentalUnsignedTypes
-class CCPrefFragment(private val adapter: TabPagerAdapter) :
-	PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 	override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-		setPreferencesFromResource(R.xml.clock_prefs, null)
+		setPreferencesFromResource(R.xml.app_prefs, rootKey)
+		preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 	}
 
-	override fun onStop() {
-		adapter.makeClock()
-		super.onStop()
+	override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+		when (key) {
+			"theme" -> setTheme(sharedPreferences)
+		}
 	}
 }

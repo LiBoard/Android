@@ -16,17 +16,11 @@
  *
  */
 
-package de.pleclercq.liboard.util
+package de.pleclercq.liboard.android.viewHolders
 
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
-fun setTheme(prefs: SharedPreferences) {
-	AppCompatDelegate.setDefaultNightMode(
-		when (prefs.getString("theme", "auto")) {
-			"light" -> AppCompatDelegate.MODE_NIGHT_NO
-			"dark" -> AppCompatDelegate.MODE_NIGHT_YES
-			else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-		}
-	)
+abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+	abstract fun updateContents(data: Any)
 }
