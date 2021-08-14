@@ -23,6 +23,10 @@ import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
+import de.pleclercq.liboard.liboard.LiBoard.board
+import de.pleclercq.liboard.liboard.LiBoard.knownPosition
+import de.pleclercq.liboard.liboard.LiBoard.liftedPieces
+import de.pleclercq.liboard.liboard.LiBoard.physicalPosition
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
 import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
@@ -34,15 +38,13 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
  * A class handling everything related to the board.
  * Handles the serial connection, incoming data and move validation.
  *
- * @param context The [Context] this object belongs to. Required for access to system services, permissions etc.
- * @param eventHandler A [LiBoardEventHandler] that is used to react to game starts, moves and connection related events.
- *
  * @property knownPosition The physical position matching [board].
  * @property physicalPosition The current physical position.
  * @property liftedPieces All pieces that were lifted (temporarily or permanently) since the last move.
  */
 @ExperimentalUnsignedTypes
-class LiBoard(private val context: Context, private var eventHandler: LiBoardEventHandler) {
+object LiBoard {
+	internal var eventHandler: LiBoardEventHandler? = null
 	val isConnected get() = connection != null
 	lateinit var board: Board
 		private set
@@ -112,12 +114,12 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	 * or tries to find a legal move matching the position otherwise.
 	 */
 	internal fun onNewPhysicalPosition(position: PhysicalPosition) {
-		eventHandler.onEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
+		eventHandler?.onEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
 		physicalPosition = position
 		if (position == PhysicalPosition.STARTING_POSITION) {
 			newGame()
 			updateKnownPosition()
-			eventHandler.onEvent(LiBoardEvent(TYPE_GAME_START))
+			eventHandler?.onEvent(LiBoardEvent(TYPE_GAME_START))
 		} else {
 			liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
 			if (!clockMove) generateMove()
@@ -144,7 +146,7 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	private fun onMove(move: Move) {
 		updateKnownPosition()
 		moveList.addLast(move)
-		eventHandler.onEvent(LiBoardEvent(TYPE_MOVE))
+		eventHandler?.onEvent(LiBoardEvent(TYPE_MOVE))
 	}
 
 	/**
@@ -174,7 +176,7 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 		}
 		knownPosition = PhysicalPosition(board)
 		liftedPieces.clear()
-		eventHandler.onEvent(LiBoardEvent(TYPE_TAKEBACK))
+		eventHandler?.onEvent(LiBoardEvent(TYPE_TAKEBACK))
 	}
 	//endregion
 
@@ -182,10 +184,10 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 	/**
 	 * Creates a new [Connection].
 	 */
-	fun connect() {
+	fun connect(context: Context) {
 		if (isConnected) disconnect()
-		connection = Connection(context, this)
-		eventHandler.onEvent(LiBoardEvent(TYPE_CONNECT))
+		connection = Connection(context)
+		eventHandler?.onEvent(LiBoardEvent(TYPE_CONNECT))
 	}
 
 	/**
@@ -195,7 +197,7 @@ class LiBoard(private val context: Context, private var eventHandler: LiBoardEve
 		if (connection != null) {
 			connection?.close()
 			connection = null
-			eventHandler.onEvent(LiBoardEvent(TYPE_DISCONNECT))
+			eventHandler?.onEvent(LiBoardEvent(TYPE_DISCONNECT))
 		}
 	}
 	//endregion

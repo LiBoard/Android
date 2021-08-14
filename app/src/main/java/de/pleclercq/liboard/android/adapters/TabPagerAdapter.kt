@@ -39,9 +39,9 @@ import de.pleclercq.liboard.android.viewHolders.TextViewHolder
 import de.pleclercq.liboard.android.viewHolders.ViewHolder
 
 @ExperimentalUnsignedTypes
-class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard) :
+class TabPagerAdapter(private val context: Context) :
 	RecyclerView.Adapter<ViewHolder>() {
-	internal val clockManager = ClockManager(context, liBoard, this)
+	internal val clockManager = ClockManager(context, this)
 	private var items = fetchItems()
 
 	//region Adapter
@@ -74,12 +74,12 @@ class TabPagerAdapter(private val context: Context, private val liBoard: LiBoard
 
 	private fun fetchItems(): List<Item> {
 		return mutableListOf(
-			Item("Board", TYPE_TEXT_BIG, liBoard.board.toString()),
-			Item("Moves", TYPE_TEXT_SMALL, Game(liBoard).toPgn()),
+			Item("Board", TYPE_TEXT_BIG, LiBoard.board.toString()),
+			Item("Moves", TYPE_TEXT_SMALL, Game(LiBoard).toPgn()),
 			Item("Clock", TYPE_CLOCK, ClockSnapshot(clockManager.clock))
 		).apply {
 			if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("debug", false))
-				add(Item("Sensors", TYPE_TEXT_BIG, liBoard.physicalPosition.toString()))
+				add(Item("Sensors", TYPE_TEXT_BIG, LiBoard.physicalPosition.toString()))
 		}
 	}
 	//endregion

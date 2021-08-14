@@ -46,7 +46,6 @@ import java.io.FileOutputStream
 @ExperimentalUnsignedTypes
 class TabbedFragment : Fragment(), LiBoardEventHandler {
 	private lateinit var binding: FragmentTabbedBinding
-	private lateinit var liBoard: LiBoard
 	private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
 	private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
 	private lateinit var adapter: TabPagerAdapter
@@ -54,7 +53,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	//region Lifecycle
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		liBoard = LiBoard(requireContext(), this)
+		LiBoard.eventHandler = this
 		setHasOptionsMenu(true)
 		requireContext().registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
 	}
@@ -62,12 +61,12 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 		binding = FragmentTabbedBinding.inflate(inflater, container, false)
 
-		if (liBoard.isConnected) binding.connectFab.hide()
+		if (LiBoard.isConnected) binding.connectFab.hide()
 		binding.connectFab.setOnClickListener { attemptConnect() }
 
 		val tl = binding.tabLayout
 		val vp = binding.viewPager
-		adapter = TabPagerAdapter(requireContext(), liBoard)
+		adapter = TabPagerAdapter(requireContext())
 		vp.adapter = adapter
 		TabLayoutMediator(tl, vp) { tab, i -> tab.text = adapter.getTitle(i) }.attach()
 
@@ -75,7 +74,8 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	}
 
 	override fun onDestroy() {
-		liBoard.disconnect()
+		LiBoard.disconnect()
+		if (LiBoard.eventHandler == this) LiBoard.eventHandler = null
 		requireContext().unregisterReceiver(usbPermissionReceiver)
 		super.onDestroy()
 	}
@@ -98,7 +98,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 					Intent.createChooser(it, null)
 				}.let { startActivity(it) }
 			}
-			R.id.takeback -> liBoard.takeback()
+			R.id.takeback -> LiBoard.takeback()
 			R.id.app_settings -> (requireContext() as AppCompatActivity).supportFragmentManager.beginTransaction()
 				.replace(R.id.main_fragment_container_view, SettingsFragment()).addToBackStack("settings").commit()
 			R.id.documentation -> {
@@ -132,7 +132,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	 */
 	private fun attemptConnect() {
 		try {
-			liBoard.connect()
+			LiBoard.connect(requireContext())
 		} catch (e: Connection.MissingDriverException) {
 			Log.d("attemptConnect", e::class.simpleName!!)
 			Toast.makeText(activity, "No Board connected", Toast.LENGTH_SHORT).show()
@@ -158,5 +158,5 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 		}
 	}
 
-	private fun gameString() = Game(liBoard).toPgn()
+	private fun gameString() = Game(LiBoard).toPgn()
 }

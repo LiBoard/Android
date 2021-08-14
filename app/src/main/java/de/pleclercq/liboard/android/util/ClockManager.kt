@@ -42,14 +42,13 @@ import java.util.concurrent.TimeUnit
 @ExperimentalUnsignedTypes
 class ClockManager(
 	private val context: Context,
-	private val liBoard: LiBoard,
 	private val adapter: TabPagerAdapter
 ) :
 	LiBoardEventHandler {
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 	var clock = prefs.makeClock()
 		set(value) {
-			liBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
+			LiBoard.clockMove = prefs.getString("clock_mode", "") == "clock-move"
 			field = value
 		}
 	private val clockMode
@@ -65,20 +64,20 @@ class ClockManager(
 		when (e.type) {
 			TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
 			TYPE_GAME_START -> {
-				if (observeMoves || liBoard.clockMove)
+				if (observeMoves || LiBoard.clockMove)
 					clock.reset()
 				adapter.updateItems()
 			}
 			TYPE_MOVE -> {
 				if (observeMoves) {
-					clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
+					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 					startClock()
 				}
 				adapter.updateItems()
 			}
 			TYPE_TAKEBACK -> {
 				if (observeMoves || clockMode == "clock-move")
-					clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
+					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 				adapter.updateItems()
 			}
 		}
@@ -86,9 +85,9 @@ class ClockManager(
 
 	internal fun onClockTapped(side: Int) {
 		if (clockMode == "independent" ||
-			(clockMode == "clock-move" && liBoard.board.sideToMove.ordinal == side && liBoard.tryClockSwitch())
+			(clockMode == "clock-move" && LiBoard.board.sideToMove.ordinal == side && LiBoard.tryClockSwitch())
 		)
-			clock.side = if (liBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
+			clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 		startClock()
 	}
 
@@ -108,8 +107,6 @@ class ClockManager(
 		(context as Activity).runOnUiThread { adapter.updateItems() }
 		if (!clock.running) handle?.cancel(true)
 	}
-
-	private fun Int.inverted() = if (this == ChessClock.WHITE) ChessClock.BLACK else ChessClock.WHITE
 
 	private fun SharedPreferences.makeClock() = when (getString("clock_mode", "")) {
 		"stopwatch" -> Stopwatch()

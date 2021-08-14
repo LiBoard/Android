@@ -40,7 +40,7 @@ import java.util.concurrent.Executors
  * Closes the serial port when it's closed.
  */
 @ExperimentalUnsignedTypes
-internal class Connection(context: Context, val liboard: LiBoard) :
+internal class Connection(context: Context) :
 	Closeable, SerialInputOutputManager.Listener {
 	private val usbManager = context.getSystemService(Context.USB_SERVICE) as UsbManager
 	private val port: UsbSerialPort
@@ -93,7 +93,7 @@ internal class Connection(context: Context, val liboard: LiBoard) :
 			var bitboard = 0UL
 			for (i in 7 downTo 0)
 				bitboard = bitboard or (data.poll()!!.toULong() shl (8 * i))
-			liboard.onNewPhysicalPosition(PhysicalPosition(bitboard))
+			LiBoard.onNewPhysicalPosition(PhysicalPosition(bitboard))
 		}
 	}
 
@@ -103,7 +103,7 @@ internal class Connection(context: Context, val liboard: LiBoard) :
 	 */
 	override fun onRunError(e: java.lang.Exception) {
 		Log.e(LOG_TAG, "onRunError", e)
-		liboard.disconnect()
+		LiBoard.disconnect()
 	}
 
 	companion object {

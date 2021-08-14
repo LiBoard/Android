@@ -22,6 +22,7 @@ import android.app.Application
 import androidx.preference.PreferenceManager
 import de.pleclercq.liboard.android.util.setTheme
 
+@ExperimentalUnsignedTypes
 @Suppress("unused")
 class Application : Application() {
 	override fun onCreate() {
