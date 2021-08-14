@@ -53,7 +53,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 	//region Lifecycle
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		LiBoard.eventHandler = this
+		LiBoard.eventHandlers.add(this)
 		setHasOptionsMenu(true)
 		requireContext().registerReceiver(usbPermissionReceiver, IntentFilter(UsbPermissionReceiver.ACTION))
 	}
@@ -75,7 +75,7 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 
 	override fun onDestroy() {
 		LiBoard.disconnect()
-		if (LiBoard.eventHandler == this) LiBoard.eventHandler = null
+		LiBoard.eventHandlers.remove(this)
 		requireContext().unregisterReceiver(usbPermissionReceiver)
 		super.onDestroy()
 	}

@@ -44,7 +44,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
  */
 @ExperimentalUnsignedTypes
 object LiBoard {
-	internal var eventHandler: LiBoardEventHandler? = null
+	internal val eventHandlers = mutableListOf<LiBoardEventHandler>()
 	val isConnected get() = connection != null
 	lateinit var board: Board
 		private set
@@ -114,12 +114,12 @@ object LiBoard {
 	 * or tries to find a legal move matching the position otherwise.
 	 */
 	internal fun onNewPhysicalPosition(position: PhysicalPosition) {
-		eventHandler?.onEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
+		broadcastEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
 		physicalPosition = position
 		if (position == PhysicalPosition.STARTING_POSITION) {
 			newGame()
 			updateKnownPosition()
-			eventHandler?.onEvent(LiBoardEvent(TYPE_GAME_START))
+			broadcastEvent(LiBoardEvent(TYPE_GAME_START))
 		} else {
 			liftedPieces.addAll(knownPosition.occupiedSquares.minus(this.physicalPosition.occupiedSquares))
 			if (!clockMove) generateMove()
@@ -141,12 +141,12 @@ object LiBoard {
 	/**
 	 * Called when a new [Move] is detected.
 	 * Updates the [knownPosition], adds the [move] to the [moveList]
-	 * and calls [eventHandler]'s [LiBoardEventHandler.onEvent].
+	 * and broadcasts the corresponding Event.
 	 */
 	private fun onMove(move: Move) {
 		updateKnownPosition()
 		moveList.addLast(move)
-		eventHandler?.onEvent(LiBoardEvent(TYPE_MOVE))
+		broadcastEvent(LiBoardEvent(TYPE_MOVE))
 	}
 
 	/**
@@ -176,7 +176,7 @@ object LiBoard {
 		}
 		knownPosition = PhysicalPosition(board)
 		liftedPieces.clear()
-		eventHandler?.onEvent(LiBoardEvent(TYPE_TAKEBACK))
+		broadcastEvent(LiBoardEvent(TYPE_TAKEBACK))
 	}
 	//endregion
 
@@ -187,7 +187,7 @@ object LiBoard {
 	fun connect(context: Context) {
 		if (isConnected) disconnect()
 		connection = Connection(context)
-		eventHandler?.onEvent(LiBoardEvent(TYPE_CONNECT))
+		broadcastEvent(LiBoardEvent(TYPE_CONNECT))
 	}
 
 	/**
@@ -197,10 +197,12 @@ object LiBoard {
 		if (connection != null) {
 			connection?.close()
 			connection = null
-			eventHandler?.onEvent(LiBoardEvent(TYPE_DISCONNECT))
+			broadcastEvent(LiBoardEvent(TYPE_DISCONNECT))
 		}
 	}
 	//endregion
+
+	private fun broadcastEvent(e: LiBoardEvent) = eventHandlers.forEach { it.onEvent(e) }
 
 	fun tryClockSwitch() = if (!clockMove) true else generateMove()
 }
