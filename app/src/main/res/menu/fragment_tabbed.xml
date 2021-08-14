@@ -11,6 +11,12 @@
 		android:icon="@drawable/ic_baseline_share_24"
 		android:title="@string/share_game"
 		app:showAsAction="ifRoom" />
+	<!--TODO show/hide depending on moves played-->
+	<item
+		android:id="@+id/takeback"
+		android:icon="@drawable/ic_outline_arrow_back_24"
+		android:title="@string/takeback"
+		app:showAsAction="never" />
 	<item
 		android:id="@+id/app_settings"
 		android:icon="@drawable/ic_baseline_settings_24"
