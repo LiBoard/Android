@@ -9,6 +9,6 @@
 		android:id="@+id/main_fragment_container_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:name="de.pleclercq.liboard.fragments.TabbedFragment"/>
+		android:name="de.pleclercq.liboard.android.fragments.TabbedFragment" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
