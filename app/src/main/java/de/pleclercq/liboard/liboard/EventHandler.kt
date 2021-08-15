@@ -21,17 +21,6 @@ package de.pleclercq.liboard.liboard
 /**
  * Handler for game starts, moves and connection related events.
  */
-interface LiBoardEventHandler {
-	fun onEvent(e: LiBoardEvent)
-}
-
-data class LiBoardEvent(val type: Int) {
-	companion object {
-		const val TYPE_CONNECT = 0
-		const val TYPE_DISCONNECT = 1
-		const val TYPE_NEW_PHYSICAL_POS = 2
-		const val TYPE_GAME_START = 3
-		const val TYPE_MOVE = 4
-		const val TYPE_TAKEBACK = 5
-	}
+interface EventHandler {
+	fun onEvent(e: Event)
 }

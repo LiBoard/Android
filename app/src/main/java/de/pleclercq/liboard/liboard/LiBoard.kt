@@ -26,14 +26,9 @@ import android.util.Log
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveList
+import de.pleclercq.liboard.liboard.Event.*
 import de.pleclercq.liboard.liboard.LiBoard.liftedPieces
 import de.pleclercq.liboard.liboard.LiBoard.physicalPosition
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
 
 /**
  * A class handling everything related to the board.
@@ -44,7 +39,7 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
  */
 @ExperimentalUnsignedTypes
 object LiBoard {
-	internal val eventHandlers = mutableListOf<LiBoardEventHandler>()
+	internal val eventHandlers = mutableListOf<EventHandler>()
 	internal var clockMove = false
 	private var moveDelay = 0L // ms
 	private var connection: Connection? = null
@@ -119,12 +114,12 @@ object LiBoard {
 	 */
 	internal fun onNewPhysicalPosition(position: PhysicalPosition) {
 		handler.removeCallbacks(generateMoveRunnable)
-		broadcastEvent(LiBoardEvent(TYPE_NEW_PHYSICAL_POS))
+		broadcastEvent(NEW_PHYSICAL_POS)
 		physicalPosition = position
 		if (position == PhysicalPosition.STARTING_POSITION) {
 			newGame()
 			liftedPieces.clear()
-			broadcastEvent(LiBoardEvent(TYPE_GAME_START))
+			broadcastEvent(GAME_START)
 		} else {
 			liftedPieces.addAll(PhysicalPosition(board).occupiedSquares.minus(this.physicalPosition.occupiedSquares))
 			if (!clockMove) handler.postDelayed(generateMoveRunnable, moveDelay)
@@ -151,7 +146,7 @@ object LiBoard {
 	private fun onMove(move: Move) {
 		liftedPieces.clear()
 		moveList.addLast(move)
-		broadcastEvent(LiBoardEvent(TYPE_MOVE))
+		broadcastEvent(MOVE)
 	}
 
 	/**
@@ -172,7 +167,7 @@ object LiBoard {
 			Log.w("takeback", "Takeback was attempted without any moves played")
 		}
 		liftedPieces.clear()
-		broadcastEvent(LiBoardEvent(TYPE_TAKEBACK))
+		broadcastEvent(TAKEBACK)
 	}
 	//endregion
 
@@ -183,7 +178,7 @@ object LiBoard {
 	fun connect(context: Context) {
 		if (isConnected) disconnect()
 		connection = Connection(context)
-		broadcastEvent(LiBoardEvent(TYPE_CONNECT))
+		broadcastEvent(CONNECT)
 	}
 
 	/**
@@ -193,12 +188,12 @@ object LiBoard {
 		if (connection != null) {
 			connection?.close()
 			connection = null
-			broadcastEvent(LiBoardEvent(TYPE_DISCONNECT))
+			broadcastEvent(DISCONNECT)
 		}
 	}
 	//endregion
 
-	private fun broadcastEvent(e: LiBoardEvent) = eventHandlers.forEach { it.onEvent(e) }
+	private fun broadcastEvent(e: Event) = eventHandlers.forEach { it.onEvent(e) }
 
 	fun updateMoveDelay(prefs: SharedPreferences) {
 		moveDelay = prefs.getString("move-delay", "0")!!.toLong()

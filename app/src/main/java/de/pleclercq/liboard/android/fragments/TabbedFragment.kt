@@ -38,13 +38,13 @@ import de.pleclercq.liboard.android.util.CreatePgnDocument
 import de.pleclercq.liboard.android.util.UsbPermissionReceiver
 import de.pleclercq.liboard.databinding.FragmentTabbedBinding
 import de.pleclercq.liboard.liboard.*
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_CONNECT
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_DISCONNECT
+import de.pleclercq.liboard.liboard.Event.CONNECT
+import de.pleclercq.liboard.liboard.Event.DISCONNECT
 import java.io.FileOutputStream
 
 @Suppress("unused")
 @ExperimentalUnsignedTypes
-class TabbedFragment : Fragment(), LiBoardEventHandler {
+class TabbedFragment : Fragment(), EventHandler {
 	private lateinit var binding: FragmentTabbedBinding
 	private val createDocument = registerForActivityResult(CreatePgnDocument()) { saveGame(it) }
 	private val usbPermissionReceiver = UsbPermissionReceiver { attemptConnect() }
@@ -114,11 +114,11 @@ class TabbedFragment : Fragment(), LiBoardEventHandler {
 		return true
 	}
 
-	override fun onEvent(e: LiBoardEvent) {
+	override fun onEvent(e: Event) {
 		(requireContext() as Activity).runOnUiThread {
-			when (e.type) {
-				TYPE_CONNECT -> binding.connectFab.hide()
-				TYPE_DISCONNECT -> {
+			when (e) {
+				CONNECT -> binding.connectFab.hide()
+				DISCONNECT -> {
 					binding.connectFab.show()
 					Toast.makeText(activity, "LiBoard disconnected", Toast.LENGTH_SHORT).show()
 				}

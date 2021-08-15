@@ -28,13 +28,10 @@ import de.pleclercq.liboard.chessclock.ChessClock
 import de.pleclercq.liboard.chessclock.DelayClock
 import de.pleclercq.liboard.chessclock.Stopwatch
 import de.pleclercq.liboard.chessclock.TimeControl
+import de.pleclercq.liboard.liboard.Event
+import de.pleclercq.liboard.liboard.Event.*
+import de.pleclercq.liboard.liboard.EventHandler
 import de.pleclercq.liboard.liboard.LiBoard
-import de.pleclercq.liboard.liboard.LiBoardEvent
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_GAME_START
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_MOVE
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_NEW_PHYSICAL_POS
-import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
-import de.pleclercq.liboard.liboard.LiBoardEventHandler
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -44,7 +41,7 @@ class ClockManager(
 	private val context: Context,
 	private val adapter: TabPagerAdapter
 ) :
-	LiBoardEventHandler {
+	EventHandler {
 	private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 	var clock = prefs.makeClock()
 		set(value) {
@@ -58,15 +55,15 @@ class ClockManager(
 	private var handle: ScheduledFuture<*>? = null
 	private val refreshDelay get() = 1000L / prefs.getString("refresh_rate", "")!!.toInt()
 
-	override fun onEvent(e: LiBoardEvent) {
-		when (e.type) {
-			TYPE_NEW_PHYSICAL_POS -> adapter.updateItems()
-			TYPE_GAME_START -> {
+	override fun onEvent(e: Event) {
+		when (e) {
+			NEW_PHYSICAL_POS -> adapter.updateItems()
+			GAME_START -> {
 				if (observeMoves || LiBoard.clockMove)
 					clock.reset()
 				adapter.updateItems()
 			}
-			TYPE_MOVE -> {
+			MOVE -> {
 				if (observeMoves) {
 					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 					if (LiBoard.board.isMated || LiBoard.board.isDraw) clock.running = false
@@ -74,11 +71,12 @@ class ClockManager(
 				}
 				adapter.updateItems()
 			}
-			TYPE_TAKEBACK -> {
+			TAKEBACK -> {
 				if (observeMoves)
 					clock.side = if (LiBoard.board.sideToMove == Side.WHITE) ChessClock.WHITE else ChessClock.BLACK
 				adapter.updateItems()
 			}
+			else -> return
 		}
 	}
 
