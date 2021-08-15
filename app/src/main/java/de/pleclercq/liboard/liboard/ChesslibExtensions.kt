@@ -20,6 +20,7 @@ package de.pleclercq.liboard.liboard
 
 import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.game.*
+import com.github.bhlangonijr.chesslib.game.Event
 import com.github.bhlangonijr.chesslib.move.Move
 import kotlin.math.abs
 
@@ -80,7 +81,7 @@ fun Game(): Game {
 	}
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@ExperimentalUnsignedTypes
 fun Game(liBoard: LiBoard) = Game().apply {
 	halfMoves = liBoard.getMoves()
 	board = liBoard.board
