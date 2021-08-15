@@ -45,18 +45,19 @@ import de.pleclercq.liboard.liboard.LiBoardEvent.Companion.TYPE_TAKEBACK
 @ExperimentalUnsignedTypes
 object LiBoard {
 	internal val eventHandlers = mutableListOf<LiBoardEventHandler>()
-	val isConnected get() = connection != null
-	lateinit var board: Board
-		private set
-	internal var physicalPosition = PhysicalPosition.STARTING_POSITION
-		private set
 	internal var clockMove = false
+	private var moveDelay = 0L // ms
 	private var connection: Connection? = null
-	private val moveList = MoveList()
-	private val liftedPieces = HashSet<Int>()
 	private val handler = Handler(Looper.getMainLooper())
 	private val generateMoveRunnable = Runnable { generateMove() }
-	private var moveDelay = 0L // ms
+
+	lateinit var board: Board private set
+	internal var physicalPosition = PhysicalPosition.STARTING_POSITION
+		private set
+	private val liftedPieces = HashSet<Int>()
+	private val moveList = MoveList()
+
+	val isConnected get() = connection != null
 
 	init {
 		newGame()
