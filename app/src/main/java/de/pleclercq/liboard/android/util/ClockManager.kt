@@ -53,7 +53,7 @@ class ClockManager(
 	private val scheduler = Executors.newScheduledThreadPool(1)
 	private val runnable = Runnable { onTick() }
 	private var handle: ScheduledFuture<*>? = null
-	private val refreshDelay get() = 1000L / prefs.getString("refresh_rate", "")!!.toInt()
+	private val refreshDelay get() = 1000L / prefs.getString("refresh_rate", "100")!!.toInt()
 
 	override fun onEvent(e: Event) {
 		when (e) {
