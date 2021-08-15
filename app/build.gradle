@@ -44,6 +44,7 @@ android {
         targetSdkVersion 31
         versionCode System.currentTimeSeconds().toInteger()
         versionName "$gitHash$gitDirty"
+        manifestPlaceholders = [label: 'LiBoard']
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -56,6 +57,7 @@ android {
         }
         debug {
             applicationIdSuffix '.debug'
+            manifestPlaceholders = [label: 'LiBoard[DEBUG]']
         }
     }
     compileOptions {
