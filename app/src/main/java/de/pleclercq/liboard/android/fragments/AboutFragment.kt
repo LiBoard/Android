@@ -42,13 +42,17 @@ class AboutFragment : Fragment() {
 	<center><h1>LiBoard</h1></center></br>
     <h3>Build time:</h3>BUILD_TIME<br/>
     <h3>Version name:</h3>VERSION_NAME<br/>
+    <h3>Build type:</h3>BUILD_TYPE<br/>
 	<h3>Credits</h3>
     <ul>
         <li><a href="https://github.com/bhlangonijr/chesslib">chesslib</a></li>
         <li><a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a></li>
         <li><a href="https://www.flaticon.com/authors/good-ware">Good Ware</a> for the icon</a></li>
     </ul>
-	""".trimIndent().replace("BUILD_TIME", buildTime).replace("VERSION_NAME", BuildConfig.VERSION_NAME)
+	""".trimIndent()
+		.replace("BUILD_TIME", buildTime)
+		.replace("VERSION_NAME", BuildConfig.VERSION_NAME)
+		.replace("BUILD_TYPE", BuildConfig.BUILD_TYPE)
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 		val binding = FragmentWebviewBinding.inflate(inflater, container, false)
