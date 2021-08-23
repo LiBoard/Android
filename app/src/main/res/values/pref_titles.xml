@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="clock_modes">
-		<item>Independent</item>
-		<item>Synchronized</item>
-		<item>Clock move</item>
-		<item>Stopwatch</item>
+		<item>@string/mode_independent</item>
+		<item>@string/mode_synchronized</item>
+		<item>@string/mode_clock_move</item>
+		<item>@string/mode_stopwatch</item>
 	</string-array>
 	<string-array name="tc_types">
-		<item>Increment</item>
-		<item>Delay</item>
+		<item>@string/increment</item>
+		<item>@string/delay</item>
 	</string-array>
 	<string-array name="themes">
-		<item>Auto</item>
-		<item>Light</item>
-		<item>Dark</item>
+		<item>@string/auto</item>
+		<item>@string/light</item>
+		<item>@string/dark</item>
 	</string-array>
 </resources>

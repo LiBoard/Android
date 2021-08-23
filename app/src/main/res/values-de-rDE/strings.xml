@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">LiBoard</string>
+	<string name="disconnect">Trennen</string>
+	<string name="connect">Verbinden</string>
+	<string name="ready">Bereit</string>
+	<string name="credits">Credits</string>
+	<string name="export_game">Partie exportieren</string>
+	<string name="stop">Stopp</string>
+	<string name="back">Zurück</string>
+	<string name="pause">Pausieren</string>
+	<string name="reset">Zurücksetzen</string>
+	<string name="settings">Einstellungen</string>
+	<string name="show_debug_info">Debug informationen anzeigen</string>
+	<string name="theme">Theme</string>
+	<string name="mode">Modus</string>
+	<string name="time_control">Bedenkzeit</string>
+	<string name="type">Typ</string>
+	<string name="white">Weiß</string>
+	<string name="init_time">Anfangszeit [min]</string>
+	<string name="increment">Inkrement [s]</string>
+	<string name="black">Schwarz</string>
+	<string name="ui_framerate">UI Bildrate</string>
+	<string name="documentation">Dokumentation</string>
+	<string name="about">Über</string>
+	<string name="share_game">Partie teilen</string>
+	<string name="takeback">Zurücknahme</string>
+	<string name="move_delay">Zugverzögerung</string>
+	<string name="mode_independent">Unabhängig</string>
+	<string name="mode_synchronized">Synchronisiert</string>
+	<string name="mode_clock_move">Clock move</string>
+	<string name="mode_stopwatch">Stoppuhr</string>
+	<string name="delay">Verzögerung</string>
+	<string name="auto">Auto</string>
+	<string name="light">Hell</string>
+	<string name="dark">Dunkel</string>
+</resources>
