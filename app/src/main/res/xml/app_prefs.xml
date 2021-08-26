@@ -1,4 +1,5 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 	<SwitchPreference
 		app:key="debug"
 		app:title="@string/show_debug_info"
@@ -18,4 +19,12 @@
 		app:dialogLayout="@layout/preference_number"
 		app:useSimpleSummaryProvider="true"
 		app:defaultValue="0" />
+
+	<DropDownPreference
+		app:key="language"
+		app:title="Language"
+		app:defaultValue="en"
+		app:entries="@array/supported_lang_codes"
+		android:entryValues="@array/supported_lang_codes"
+		app:useSimpleSummaryProvider="true" />
 </PreferenceScreen>

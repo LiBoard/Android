@@ -20,6 +20,8 @@ package de.pleclercq.liboard.android.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
+import com.yariksoffice.lingver.Lingver
 import de.pleclercq.liboard.R
 import de.pleclercq.liboard.android.fragments.TabbedFragment
 import de.pleclercq.liboard.databinding.ActivityMainBinding
@@ -28,6 +30,10 @@ import de.pleclercq.liboard.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+//		Lingver.getInstance().setLocale(
+//			applicationContext,
+//			PreferenceManager.getDefaultSharedPreferences(this).getString("language", "en")!!
+//		)
 		val binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 		supportFragmentManager.beginTransaction().replace(R.id.main_fragment_container_view, TabbedFragment()).commit()

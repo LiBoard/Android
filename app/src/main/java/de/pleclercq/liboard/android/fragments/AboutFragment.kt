@@ -47,6 +47,7 @@ class AboutFragment : Fragment() {
     <ul>
         <li><a href="https://github.com/bhlangonijr/chesslib">chesslib</a></li>
         <li><a href="https://github.com/mik3y/usb-serial-for-android">usb-serial-for-android</a></li>
+		<li><a href="https://github.com/YarikSOffice/lingver">Lingver</a></li>
         <li><a href="https://www.flaticon.com/authors/good-ware">Good Ware</a> for the icon</a></li>
     </ul>
 	""".trimIndent()
